@@ -1,0 +1,3 @@
+class ExchangeRate
+
+end
