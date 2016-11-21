@@ -15,6 +15,7 @@
 .ruby-gemset
 config/secrets.yml
 config/database.yml
+.DS_Store
 
 # Ignore all logfiles and tempfiles.
 /log/*

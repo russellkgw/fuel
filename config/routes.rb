@@ -1,9 +1,7 @@
 # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
 
 Rails.application.routes.draw do
-  # get '/data-import', to: 'data#index'
+  get 'session_controller/create'
 
-  namespace :data do
-    get '/import', to: 'import#index'
-  end
+  root 'data_import#index'
 end
