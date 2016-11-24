@@ -1,41 +1,46 @@
-<div>
-  <h1>Import data</h1>
-  <h2>Select data files for upload, existing records will be updated if found.</h2>
+<%= form_tag(data_import_path, method: :post, multipart: true) do %>
+    <div>
+      <h1>Import data</h1>
+      <h2>Select data files for upload, existing records will be updated if found.</h2>
 
-  <h4>Exchange Rates.</h4>
-  <p>
-    A csv file is required with the following headers:
-    <ul>
-      <li>Base</li>
-      <li>Currency</li>
-      <li>Value</li>
-      <li>Date</li>
-    </ul>
-  <input type="file" name="pic" accept=".csv">
-  </p>
+      <% if flash[:notice] %>
+          <div class="notice"><%= flash[:notice] %></div>
+      <% end %>
 
-  <h4>Oil Prices.</h4>
-  <p>
-    A csv file is required with the following headers:
-  <ul>
-    <li>Currency</li>
-    <li>Value</li>
-    <li>Date</li>
-  </ul>
-  <input type="file" name="pic" accept=".csv">
-  </p>
+      <h4>Exchange Rates.</h4>
+      <p>
+        A csv file is required with the following headers:
+      <ul>
 
-  <h4>Fuel Prices.</h4>
-  <p>
-    A csv file is required with the following headers:
-  <ul>
-    <li>Currency</li>
-    <li>Base</li>
-    <li>Full</li>
-    <li>Date</li>
-  </ul>
-  <input type="file" name="pic" accept=".csv">
-  </p>
+        <% @headers[Data::Handler::EXCHANGE_RATE_FILE].each do |header| %>
+            <li><%= header %></li>
+        <% end %>
+      </ul>
+      <%= file_field_tag :exchange_rate_file, accept: 'text/csv' %>
+      </p>
 
-  <submit>Upload</submit>
-</div>
+      <h4>Oil Prices.</h4>
+      <p>
+        A csv file is required with the following headers:
+      <ul>
+        <% @headers[Data::Handler::OIL_PRICE_FILE].each do |header| %>
+            <li><%= header %></li>
+        <% end %>
+      </ul>
+      <%= file_field_tag :oil_price_file, accept: 'text/csv' %>
+      </p>
+
+      <h4>Fuel Prices.</h4>
+      <p>
+        A csv file is required with the following headers:
+      <ul>
+        <% @headers[Data::Handler::FUEL_PRICE_FILE].each do |header| %>
+            <li><%= header %></li>
+        <% end %>
+      </ul>
+      <%= file_field_tag :fuel_price_file, accept: 'text/csv' %>
+      </p>
+
+      <%= submit_tag "Upload", data: { disable_with: "Uploading..." } %>
+    </div>
+<% end %>

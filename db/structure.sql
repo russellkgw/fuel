@@ -55,6 +55,7 @@ CREATE TABLE exchange_rates (
     currency character varying(255),
     value numeric,
     date date,
+    source character varying,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -89,6 +90,7 @@ CREATE TABLE fuel_prices (
     base numeric,
     "full" numeric,
     date date,
+    source character varying,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -122,6 +124,7 @@ CREATE TABLE oil_prices (
     currency character varying(255),
     value numeric,
     date date,
+    source character varying,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );

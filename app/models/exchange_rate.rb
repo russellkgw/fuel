@@ -1,3 +1,3 @@
-class ExchangeRate
+class ExchangeRate < ActiveRecord::Base
 
 end
