@@ -1,4 +1,5 @@
 class DataImportController < ApplicationController
+  before_action :authenticate
 
   def index
     @headers = { Data::Handler::EXCHANGE_RATE_FILE => Data::ExchangeRateImport::VALID_HEADERS,

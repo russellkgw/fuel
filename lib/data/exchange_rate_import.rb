@@ -1,19 +1,20 @@
-# CSV Headers
-# 0 base
-# 1 currency
-# 2 value
-# 3 date
-# 4 source
-
 class Data::ExchangeRateImport < Data::CsvImport
-  VALID_HEADERS = %W(Base Currency Value Date Source)
+
+  STRUCTURE = { 'Base' => { type: 'String', permitted: ['USD'] },
+                'Currency' => { type: 'String', permitted: ['ZAR'] },
+                'Value' => { type: 'Decimal', permitted: [] },
+                'Date' => { type: 'Date', permitted: [] },
+                'Source' => { type: 'String', permitted: ['https://openexchangerates.org/'] },
+                'Update' => { type: 'String', permitted: ['yes', 'no'] } }
+
+  VALID_HEADERS = STRUCTURE.keys
 
   def self.import(file)
     exchange_import = new
-    result = exchange_import.import(file, VALID_HEADERS)
+    result = exchange_import.import(file, STRUCTURE)
 
     if result[:valid] == true
-      exchange_import.create_update(result[:data])
+      exchange_import.insert_data(result[:data])
       result[:valid]
     else
       result[:valid]
@@ -24,19 +25,22 @@ class Data::ExchangeRateImport < Data::CsvImport
     super
   end
 
-  def create_update(data)
-    existing_records = ExchangeRate.all
-
-    # remove headers
-    data.delete_at(0)
-
+  def insert_data(data)
     data.each do |item|
-      record = existing_records.where(base: item[0], currency: item[1], date: Date.parse(item[3])).first
+      record = ExchangeRate.where(base: item[0], currency: item[1], date: Date.parse(item[3])).first
 
-      if record.present?
-        record.update({ base: item[0], currency: item[1], value: item[2], date: Date.parse(item[3]), source: item[4] })
-      else
-        ExchangeRate.create({ base: item[0], currency: item[1], value: item[2], date: Date.parse(item[3]), source: item[4] })
+      if record.present? && item[5] == 'yes'
+        record.update({ base: item[0],
+                        currency: item[1],
+                        rate: item[2],
+                        date: Date.parse(item[3]),
+                        source: item[4] })
+      elsif record.blank?
+        ExchangeRate.create({ base: item[0],
+                              currency: item[1],
+                              rate: item[2],
+                              date: Date.parse(item[3]),
+                              source: item[4] })
       end
     end
   end

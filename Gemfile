@@ -16,7 +16,7 @@ gem 'puma', '~> 3.0'
 gem 'uglifier', '>= 1.3.0'
 
 # Use CoffeeScript for .coffee assets and views
-gem 'coffee-rails', '~> 4.2'
+# gem 'coffee-rails', '~> 4.2'
 
 # See https://github.com/rails/execjs#readme for more supported runtimes
 # gem 'therubyracer', platforms: :ruby
@@ -28,7 +28,10 @@ gem 'jquery-rails'
 gem 'turbolinks', '~> 5'
 
 # Gems
-gem 'devise', '~> 4.2'
+# gem 'devise', '~> 4.2'
+# gem 'delayed_job', '~> 4.1', '>= 4.1.2'
+# gem 'delayed_job_active_record', '~> 4.1', '>= 4.1.1'
+# gem 'daemons'
 
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 # gem 'jbuilder', '~> 2.5'
@@ -51,6 +54,3 @@ group :development do
   gem 'spring'
   gem 'spring-watcher-listen', '~> 2.0.0'
 end
-
-# Windows does not include zoneinfo files, so bundle the tzinfo-data gem
-# gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]

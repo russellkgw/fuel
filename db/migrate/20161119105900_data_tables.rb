@@ -3,17 +3,17 @@ class DataTables < ActiveRecord::Migration[5.0]
     create_table(:exchange_rates) do |t|
       t.string :base, limit: 255
       t.string :currency, limit: 255
-      t.decimal :value
+      t.decimal :rate
       t.date :date
-      t.string :source
+      t.string :source, limit: 255
       t.timestamps
     end
 
     create_table(:oil_prices) do |t|
       t.string :currency, limit: 255
-      t.decimal :value
+      t.decimal :price
       t.date :date
-      t.string :source
+      t.string :source, limit: 255
       t.timestamps
     end
 
@@ -22,7 +22,7 @@ class DataTables < ActiveRecord::Migration[5.0]
       t.decimal :base
       t.decimal :full
       t.date :date
-      t.string :source
+      t.string :source, limit: 255
       t.timestamps
     end
 

@@ -4,7 +4,6 @@ class Data::Handler
   OIL_PRICE_FILE = 'oil_price_file'
   FUEL_PRICE_FILE = 'fuel_price_file'
 
-
   def self.process_csv_files(data_files)
     new.process_csv_files(data_files)
   end
@@ -32,7 +31,7 @@ class Data::Handler
       when FUEL_PRICE_FILE
         Data::FuelPriceImport.import(file)
       else
-        'file not support.'
+        'file not supported.'
     end
   end
 end

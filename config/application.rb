@@ -18,5 +18,7 @@ module Fuel
     # Custom directories with classes and modules you want to be autoloadable.
     config.autoload_paths += [Rails.root.join('lib')]
 
+    # Active job config
+    # config.active_job.queue_adapter = :delayed_job
   end
 end

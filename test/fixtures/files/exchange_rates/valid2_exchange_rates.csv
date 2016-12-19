@@ -1,0 +1,3 @@
+Base,Currency,Value,Date,Source,Update
+USD,ZAR,8,01/01/2007,https://openexchangerates.org/,yes
+USD,ZAR,9,02/01/2007,https://openexchangerates.org/,no

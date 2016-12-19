@@ -1,0 +1,22 @@
+<%= form_tag(session_path, method: :post) do %>
+    <div>
+      <h1>Fuel login</h1>
+
+      <% if flash[:notice] %>
+          <div class="notice"><%= flash[:notice] %></div>
+      <% end %>
+
+      <div>
+        <%= label_tag :authorisation_token %>
+        <%= password_field_tag :authorisation_token, nil %>
+      </div>
+
+      <div>
+        <%= Rails.application.secrets.authorisation_token %>
+      </div>
+
+      <div>
+        <%= submit_tag "Submit", data: { disable_with: "Processing..." } %>
+      </div>
+    </div>
+<% end %>

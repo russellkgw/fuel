@@ -53,9 +53,9 @@ CREATE TABLE exchange_rates (
     id integer NOT NULL,
     base character varying(255),
     currency character varying(255),
-    value numeric,
+    rate numeric,
     date date,
-    source character varying,
+    source character varying(255),
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -90,7 +90,7 @@ CREATE TABLE fuel_prices (
     base numeric,
     "full" numeric,
     date date,
-    source character varying,
+    source character varying(255),
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -122,9 +122,9 @@ ALTER SEQUENCE fuel_prices_id_seq OWNED BY fuel_prices.id;
 CREATE TABLE oil_prices (
     id integer NOT NULL,
     currency character varying(255),
-    value numeric,
+    price numeric,
     date date,
-    source character varying,
+    source character varying(255),
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
