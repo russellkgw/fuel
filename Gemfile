@@ -10,9 +10,6 @@ gem 'turbolinks', '~> 5'
 # See https://github.com/rails/execjs#readme for more supported runtimes
 # gem 'therubyracer', platforms: :ruby
 
-# Use Capistrano for deployment
-# gem 'capistrano-rails', group: :development
-
 group :test do
   gem 'webmock', '~> 2.3', '>= 2.3.1'
   gem 'mocha', '~> 1.2', '>= 1.2.1'
@@ -20,4 +17,5 @@ end
 
 group :development do
   gem 'byebug', platform: :mri
+  gem 'capistrano-rails'
 end
