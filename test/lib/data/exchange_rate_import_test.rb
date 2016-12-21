@@ -1,7 +1,7 @@
 require 'test_helper'
 
 class ExchangeRateImportTest < ActiveSupport::TestCase
-  test "valid case - insert and updatedata" do
+  test 'valid case - insert and updatedata' do
     file = File.open(File.join(Rails.root, 'test','fixtures', 'files', 'exchange_rates', 'valid_exchange_rates.csv'))
     res = Data::ExchangeRateImport.import(file)
     assert_equal(true, res)
@@ -18,7 +18,7 @@ class ExchangeRateImportTest < ActiveSupport::TestCase
     assert_equal(6.945152, ExchangeRate.find_by_date('2007-01-02').rate)
   end
 
-  test "invalid case - header invalid" do
+  test 'invalid case - header invalid' do
     file = File.open(File.join(Rails.root, 'test','fixtures', 'files', 'exchange_rates', 'invalid_header_exchange_rates.csv'))
     res = Data::ExchangeRateImport.import(file)
     assert_equal(false, res)
@@ -35,7 +35,7 @@ class ExchangeRateImportTest < ActiveSupport::TestCase
     file.close
   end
 
-  test "invalid case - invalid content" do
+  test 'invalid case - invalid content' do
     file = File.open(File.join(Rails.root, 'test','fixtures', 'files', 'exchange_rates', 'invalid_content_exchange_rates.csv'))
     res = Data::ExchangeRateImport.import(file)
     assert_equal(false, res)

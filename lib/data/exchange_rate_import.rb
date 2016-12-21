@@ -11,13 +11,13 @@ class Data::ExchangeRateImport < Data::CsvImport
 
   def self.import(file)
     exchange_import = new
-    result = exchange_import.import(file, STRUCTURE)
+    result, data = exchange_import.import(file, STRUCTURE)
 
-    if result[:valid] == true
-      exchange_import.insert_data(result[:data])
-      result[:valid]
+    if result
+      exchange_import.insert_data(data)
+      result
     else
-      result[:valid]
+      result
     end
   end
 

@@ -8,10 +8,10 @@ class Data::CsvImport
     file_data = parse_file(csv_file)
 
     if valid_file?(expected_structure, file_data)
-      { valid: true, data: file_data }
+      return true, file_data
     else
       # TODO: report errors
-      { valid: false, data: ['An error has occurred during the parsing of the files, please re evaluate before uploading again.'] }
+      return false, ['An error has occurred during the parsing of the files, please re evaluate before uploading again.']
     end
   end
 
