@@ -7,13 +7,11 @@
       <% end %>
 
       <div>
+        <%= label_tag :authorisation_token %>
+      </div>
+      <div>
         <%= password_field_tag :authorisation_token, nil %>
       </div>
-
-      <div>
-        <%= Rails.application.secrets.authorisation_token %>
-      </div>
-
       <div>
         <%= submit_tag "Submit", data: { disable_with: "Processing..." } %>
       </div>
