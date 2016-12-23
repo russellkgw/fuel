@@ -23,21 +23,22 @@ class Data::Api::ExchangeRateService
   def call
     return if ExchangeRate.where('created_at::timestamp::date = now()::timestamp::date').any?
 
-    uri = URI("https://openexchangerates.org/api/latest.json?app_id=#{Rails.application.secrets.exchange_key}&base=USD")
+    prev_date = (Date.today - 1).to_s   # We are looking for the closing rate of the previous day.
+    uri = URI("https://openexchangerates.org/api/historical/#{prev_date}.json?app_id=#{Rails.application.secrets.exchange_key}&base=USD")
     service_request = Net::HTTP.get_response(uri)
 
     if service_request.response.is_a?(Net::HTTPSuccess)
-      save_exchange_rate(JSON.parse(service_request.body).to_h['rates']['ZAR'])
+      save_exchange_rate(JSON.parse(service_request.body).to_h['rates']['ZAR'], prev_date)
     else
       raise IntegrationError.new("Unable to successfully call #{OPEN_EXCHANGE_URL}, error: #{service_request.body.to_s}")
     end
   end
 
-  def save_exchange_rate(value)
+  def save_exchange_rate(value, date)
     ExchangeRate.create(base: 'USD',
                         currency: 'ZAR',
                         rate: value,
-                        date: Date.today,
+                        date: date,
                         source: 'https://openexchangerates.org/')
   end
 end
