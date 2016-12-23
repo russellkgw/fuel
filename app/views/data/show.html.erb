@@ -1,0 +1,23 @@
+<div>
+  <h1>Data</h1>
+  <h2>Exchange Rates</h2>
+  <ul>
+    <% @data[:exchange_rates].each do |item| %>
+      <li><%= "#{item.date} - #{item.base} - #{item.currency} - #{item.rate}" %></li>
+    <% end %>
+  </ul>
+
+  <h2>Oil Prices</h2>
+  <ul>
+    <% @data[:oil_prices].each do |item| %>
+        <li><%= "#{item.date} - #{item.currency} - #{item.price}" %></li>
+    <% end %>
+  </ul>
+
+  <h2>Fuel Prices</h2>
+  <ul>
+    <% @data[:fuel_prices].each do |item| %>
+        <li><%= "#{item.date} - #{item.currency} - #{item.base} - #{item.full}" %></li>
+    <% end %>
+  </ul>
+</div>

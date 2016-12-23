@@ -8,7 +8,7 @@ class SessionController < ApplicationController
     if params[:authorisation_token] == Rails.application.secrets.authorisation_token
       reset_session
       session[:logged_in] = true
-      redirect_to data_import_url
+      redirect_to data_url
     else
       flash[:notice] = 'Invalid authorization token. Please try again.'
       redirect_to root_url

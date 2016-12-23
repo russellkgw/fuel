@@ -1,4 +1,4 @@
-class DataImportController < ApplicationController
+class DataController < ApplicationController
   before_action :authenticate
 
   def index
@@ -12,12 +12,22 @@ class DataImportController < ApplicationController
     redirect_to action: 'index'
   end
 
+  def show
+    @data = build_data
+  end
+
   private
 
   def data_files
     { Data::Handler::EXCHANGE_RATE_FILE => params[Data::Handler::EXCHANGE_RATE_FILE].try(:tempfile),
       Data::Handler::OIL_PRICE_FILE => params[Data::Handler::OIL_PRICE_FILE].try(:tempfile),
       Data::Handler::FUEL_PRICE_FILE => params[Data::Handler::FUEL_PRICE_FILE].try(:tempfile) }
+  end
+
+  def build_data
+    { exchange_rates: ExchangeRate.order(date: :desc).last(10),
+      oil_prices: OilPrice.order(date: :desc).last(10),
+      fuel_prices: FuelPrice.order(date: :desc).last(10) }
   end
 
 end

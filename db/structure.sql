@@ -220,11 +220,32 @@ ALTER TABLE ONLY schema_migrations
 
 
 --
+-- Name: exchange_rate_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX exchange_rate_index ON exchange_rates USING btree (date DESC);
+
+
+--
+-- Name: fuel_price_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX fuel_price_index ON fuel_prices USING btree (date DESC);
+
+
+--
+-- Name: oil_price_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX oil_price_index ON oil_prices USING btree (date DESC);
+
+
+--
 -- PostgreSQL database dump complete
 --
 
 SET search_path TO "$user", public;
 
-INSERT INTO schema_migrations (version) VALUES ('20161119105900');
+INSERT INTO schema_migrations (version) VALUES ('20161119105900'), ('20161223171359');
 
 

@@ -1,6 +1,7 @@
-<%= form_tag(data_import_path, method: :post, multipart: true) do %>
+<%= form_tag(data_path, method: :post, multipart: true) do %>
     <div>
       <h1>Import data</h1>
+      <%= link_to 'view data', data_show_path %>
       <h2>Select data files for upload, existing records will be updated if found.</h2>
 
       <% if flash[:notice] %>

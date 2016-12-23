@@ -8,7 +8,7 @@ class SessionControllerTest < ActionController::TestCase
 
   test "log in" do
     post :create, params: { authorisation_token: 'test' }
-    assert_redirected_to data_import_path
+    assert_redirected_to data_path
 
     post :create, params: { authorisation_token: 'test1' }
     assert_redirected_to root_path
