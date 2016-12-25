@@ -21,9 +21,9 @@ class Data::Api::ExchangeRateService
   end
 
   def call
-    return if ExchangeRate.where('created_at::timestamp::date = now()::timestamp::date').any?
-
     prev_date = (Date.today - 1).to_s   # We are looking for the closing rate of the previous day.
+    return if ExchangeRate.where(date: prev_date).any?
+
     uri = URI("https://openexchangerates.org/api/historical/#{prev_date}.json?app_id=#{Rails.application.secrets.exchange_key}&base=USD")
     service_request = Net::HTTP.get_response(uri)
 
