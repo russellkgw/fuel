@@ -22,24 +22,30 @@ class Data::Api::OilPriceService
 
   def call
     prev_date = Date.today - 1   # We are looking for the closing rate of the previous day.
-    return if (OilPrice.where(date: prev_date).any? || is_weekend_day?(prev_date))
+    prev_month = prev_date - 1.month
 
-    uri = URI("https://www.quandl.com/api/v3/datasets/EIA/PET_RBRTE_D.json?api_key=#{Rails.application.secrets.oil_price_key}&start_date=#{prev_date.to_s}&end_date=#{prev_date.to_s}")
+    return if (OilPrice.find_by_date(prev_date).present? || is_weekend_day?(prev_date))
+
+    uri = URI("https://www.quandl.com/api/v3/datasets/EIA/PET_RBRTE_D.json?api_key=#{Rails.application.secrets.oil_price_key}&start_date=#{prev_month.to_s}&end_date=#{prev_date.to_s}")
     service_request = Net::HTTP.get_response(uri)
 
     if service_request.response.is_a?(Net::HTTPSuccess)
       data = JSON.parse(service_request.body).to_h['dataset']['data']
-      save_oil_price([0][1], prev_date) if data.any?
+      save_oil_price(data) if data.any?
     else
       raise IntegrationError.new("Unable to successfully call oil price api, error: #{service_request.body.to_s}")
     end
   end
 
-  def save_oil_price(value, date)
-    OilPrice.create(currency: 'USD',
-                    price: value,
-                    date: date,
-                    source: 'https://www.quandl.com/api/v3/datasets/EIA/PET_RBRTE_D')
+  def save_oil_price(data)
+    data.each do |item|
+      next if OilPrice.find_by_date(item[0]).present?
+
+      OilPrice.create(currency: 'USD',
+                      price: item[1],
+                      date: item[0],
+                      source: 'https://www.quandl.com/api/v3/datasets/EIA/PET_RBRTE_D')
+    end
   end
 
   def is_weekend_day?(day)
