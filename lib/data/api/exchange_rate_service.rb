@@ -12,7 +12,7 @@ class Data::Api::ExchangeRateService
   end
 
   def call_service(retry_count: RETRY_COUNT)
-    call()
+    Rails.env.development? ? call_dev() : call_prod()
   rescue => e
     sleep(TimeHelper.exponential_drop_off(base: ((RETRY_COUNT - retry_count) + 2)))
     retry_count -= 1
@@ -20,9 +20,9 @@ class Data::Api::ExchangeRateService
     ErrorHelper.mail_error('Exchange rate service error: ', e.message)
   end
 
-  def call
+  def call_prod
     prev_date = (Date.today - 1).to_s   # We are looking for the closing rate of the previous day.
-    return if ExchangeRate.where(date: prev_date).any?
+    return if date_data_exists?(prev_date)
 
     uri = URI("https://openexchangerates.org/api/historical/#{prev_date}.json?app_id=#{Rails.application.secrets.exchange_key}&base=USD")
     service_request = Net::HTTP.get_response(uri)
@@ -34,11 +34,32 @@ class Data::Api::ExchangeRateService
     end
   end
 
+  def call_dev
+    prev_date = Date.today - 1
+    prev_month = prev_date - 1.month
+
+    (prev_month..prev_date).each do |date|
+      next if date_data_exists?(date)
+      uri = URI("https://openexchangerates.org/api/historical/#{date.to_s}.json?app_id=#{Rails.application.secrets.exchange_key}&base=USD")
+      service_request = Net::HTTP.get_response(uri)
+
+      if service_request.response.is_a?(Net::HTTPSuccess)
+        save_exchange_rate(JSON.parse(service_request.body).to_h['rates']['ZAR'], date)
+      else
+        raise IntegrationError.new("Unable to successfully call openexchangerate.org, error: #{service_request.body.to_s}")
+      end
+    end
+  end
+
   def save_exchange_rate(value, date)
     ExchangeRate.create(base: 'USD',
                         currency: 'ZAR',
                         rate: value,
                         date: date,
                         source: 'https://openexchangerates.org/')
+  end
+
+  def date_data_exists?(date)
+    ExchangeRate.where(date: date).any?
   end
 end
