@@ -1,15 +1,21 @@
 class Data::OilPriceImport < Data::CsvImport
-  VALID_HEADERS = %W(Currency Value Date Source)
+  STRUCTURE = { 'Currency' => { type: 'String', permitted: ['USD'] },
+                'Date' => { type: 'String', permitted: [] },
+                'Value' => { type: 'Date', permitted: [] },
+                'Source' => { type: 'String', permitted: ['https://www.quandl.com/api/v3/datasets/EIA/PET_RBRTE_D'] },
+                'Update' => { type: 'String', permitted: ['yes', 'no'] } }
+
+  VALID_HEADERS = STRUCTURE.keys
 
   def self.import(file)
     oil_import = new
-    result = oil_import.import(file, VALID_HEADERS)
+    result, data = oil_import.import(file, STRUCTURE)
 
-    if result[:valid] == true
-      oil_import.insert_data(result[:data])
-      result[:valid]
+    if result
+      oil_import.insert_data(data)
+      result
     else
-      result[:valid]
+      result
     end
   end
 
@@ -17,19 +23,17 @@ class Data::OilPriceImport < Data::CsvImport
     super
   end
 
-  def create_update(data)
-    existing_records = OilPrice.all
-
-    # remove headers
-    data.delete_at(0)
-
+  def insert_data(data)
     data.each do |item|
-      record = existing_records.where(base: item[0], currency: item[1], date: Date.parse(item[3])).first
+      record = OilPrice.where(currency: item[0], date: Date.parse(item[1])).first
 
-      if record.present?
-        record.update({ base: item[0], currency: item[1], value: item[2], date: Date.parse(item[3]), source: item[4] })
-      else
-        ExchangeRate.create({ base: item[0], currency: item[1], value: item[2], date: Date.parse(item[3]), source: item[4] })
+      if record.present? && item[4] == 'yes'
+        record.update({ price: item[2] })
+      elsif record.blank?
+        OilPrice.create({ currency: item[0],
+                          price: item[1],
+                          date: Date.parse(item[2]),
+                          source: item[3] })
       end
     end
   end

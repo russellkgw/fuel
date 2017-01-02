@@ -30,11 +30,7 @@ class Data::ExchangeRateImport < Data::CsvImport
       record = ExchangeRate.where(base: item[0], currency: item[1], date: Date.parse(item[3])).first
 
       if record.present? && item[5] == 'yes'
-        record.update({ base: item[0],
-                        currency: item[1],
-                        rate: item[2],
-                        date: Date.parse(item[3]),
-                        source: item[4] })
+        record.update({ rate: item[2] })
       elsif record.blank?
         ExchangeRate.create({ base: item[0],
                               currency: item[1],
