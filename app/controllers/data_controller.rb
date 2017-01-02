@@ -25,9 +25,9 @@ class DataController < ApplicationController
   end
 
   def build_data
-    { exchange_rates: ExchangeRate.order(date: :desc).last(10),
-      oil_prices: OilPrice.order(date: :desc).last(10),
-      fuel_prices: FuelPrice.order(date: :desc).last(10) }
+    { exchange_rates: ExchangeRate.order(date: :desc).first(10),
+      oil_prices: OilPrice.order(date: :desc).first(10),
+      fuel_prices: FuelPrice.order(date: :desc).first(10) }
   end
 
 end

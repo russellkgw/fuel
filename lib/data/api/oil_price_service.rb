@@ -24,8 +24,6 @@ class Data::Api::OilPriceService
     prev_date = Date.today - 1   # We are looking for the closing rate of the previous day.
     prev_month = prev_date - 1.month
 
-    # return if OilPrice.find_by_date(prev_date).present? || is_weekend_day?(prev_date)
-
     uri = URI("https://www.quandl.com/api/v3/datasets/EIA/PET_RBRTE_D.json?api_key=#{Rails.application.secrets.oil_price_key}&start_date=#{prev_month.to_s}&end_date=#{prev_date.to_s}")
     service_request = Net::HTTP.get_response(uri)
 
