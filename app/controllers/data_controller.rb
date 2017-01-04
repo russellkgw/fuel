@@ -3,7 +3,7 @@ class DataController < ApplicationController
 
   def index
     @headers = { Data::Handler::EXCHANGE_RATE_FILE => Data::ExchangeRateImport::VALID_HEADERS,
-                 Data::Handler::OIL_PRICE_FILE => Data::ExchangeRateImport::VALID_HEADERS,
+                 Data::Handler::OIL_PRICE_FILE => Data::OilPriceImport::VALID_HEADERS,
                  Data::Handler::FUEL_PRICE_FILE => Data::ExchangeRateImport::VALID_HEADERS }
   end
 

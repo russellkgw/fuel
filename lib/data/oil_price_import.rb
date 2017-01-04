@@ -31,8 +31,8 @@ class Data::OilPriceImport < Data::CsvImport
         record.update({ price: item[2] })
       elsif record.blank?
         OilPrice.create({ currency: item[0],
-                          price: item[1],
-                          date: Date.parse(item[2]),
+                          date: Date.parse(item[1]),
+                          price: item[2],
                           source: item[3] })
       end
     end

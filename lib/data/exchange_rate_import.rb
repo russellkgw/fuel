@@ -4,7 +4,7 @@ class Data::ExchangeRateImport < Data::CsvImport
                 'Currency' => { type: 'String', permitted: ['ZAR'] },
                 'Value' => { type: 'Decimal', permitted: [] },
                 'Date' => { type: 'Date', permitted: [] },
-                'Source' => { type: 'String', permitted: ['https://openexchangerates.org/'] },
+                'Source' => { type: 'String', permitted: ['https://openexchangerates.org/', 'https://www.resbank.co.za'] },
                 'Update' => { type: 'String', permitted: ['yes', 'no'] } }
 
   VALID_HEADERS = STRUCTURE.keys
