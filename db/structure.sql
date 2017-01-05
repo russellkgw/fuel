@@ -86,13 +86,28 @@ ALTER SEQUENCE exchange_rates_id_seq OWNED BY exchange_rates.id;
 
 CREATE TABLE fuel_prices (
     id integer NOT NULL,
-    currency character varying(255),
-    base numeric,
-    "full" numeric,
+    basic_fuel_price numeric,
+    full_95_coast numeric,
     date date,
     source character varying(255),
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    exchange_rate numeric,
+    crude_oil numeric,
+    bfp numeric,
+    fuel_tax numeric,
+    customs_excise numeric,
+    equalization_fund_levy numeric,
+    raf numeric,
+    transport_cost numeric,
+    petroleum_products_levy numeric,
+    wholesale_margin numeric,
+    secondary_storage numeric,
+    secondary_distribution numeric,
+    retail_margin numeric,
+    slate_levy numeric,
+    delivery_cost numeric,
+    dsml numeric
 );
 
 
@@ -246,6 +261,6 @@ CREATE INDEX oil_price_index ON oil_prices USING btree (date DESC);
 
 SET search_path TO "$user", public;
 
-INSERT INTO schema_migrations (version) VALUES ('20161119105900'), ('20161223171359');
+INSERT INTO schema_migrations (version) VALUES ('20161119105900'), ('20161223171359'), ('20170104201226');
 
 

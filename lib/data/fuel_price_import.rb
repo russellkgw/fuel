@@ -24,14 +24,14 @@ VALID_HEADERS = STRUCTURE.keys
 
 class Data::FuelPriceImport < Data::CsvImport
   def self.import(file)
-    fuel_import = new
-    result = fuel_import.import(file, VALID_HEADERS)
+    fuel_price_import = new
+    result, data = fuel_price_import.import(file, VALID_HEADERS)
 
-    if result[:valid] == true
-      fuel_import.insert_data(result[:data])
-      result[:valid]
+    if result
+      fuel_price_import.insert_data(data)
+      result
     else
-      result[:valid]
+      result
     end
   end
 
@@ -40,6 +40,51 @@ class Data::FuelPriceImport < Data::CsvImport
   end
 
   def insert_data(data)
+    data.each do |item|
+      record = FuelPrice.where(date: Date.parse(item[0])).first
 
+      if record.present? && item[20] == 'yes'
+        record.update({ full_95_coast: item[1],
+                        basic_fuel_price: item[2],
+                        exchange_rate: item[3],
+                        crude_oil: item[4],
+                        bfp: item[5],
+                        fuel_tax: item[6],
+                        customs_excise: item[7],
+                        equalization_fund_levy: item[8],
+                        raf: item[9],
+                        transport_cost: item[10],
+                        petroleum_products_levy: item[11],
+                        wholesale_margin: item[12],
+                        secondary_storage: item[13],
+                        secondary_distribution: item[14],
+                        retail_margin: item[15],
+                        slate_levy: item[16],
+                        delivery_cost: item[17],
+                        dsml: item[18],
+                        source: item[19]})
+      elsif record.blank?
+        FuelPrice.create({ date: Date.parse(item[0]),
+                           full_95_coast: item[1],
+                           basic_fuel_price: item[2],
+                           exchange_rate: item[3],
+                           crude_oil: item[4],
+                           bfp: item[5],
+                           fuel_tax: item[6],
+                           customs_excise: item[7],
+                           equalization_fund_levy: item[8],
+                           raf: item[9],
+                           transport_cost: item[10],
+                           petroleum_products_levy: item[11],
+                           wholesale_margin: item[12],
+                           secondary_storage: item[13],
+                           secondary_distribution: item[14],
+                           retail_margin: item[15],
+                           slate_levy: item[16],
+                           delivery_cost: item[17],
+                           dsml: item[18],
+                           source: item[19]})
+      end
+    end
   end
 end
