@@ -17,7 +17,7 @@
   <h2>Fuel Prices</h2>
   <ul>
     <% @data[:fuel_prices].each do |item| %>
-        <li><%= "#{item.date} - #{item.currency} - #{item.base} - #{item.full}" %></li>
+        <li><%= "#{item.date} - #{item.full_95_coast} - #{item.basic_fuel_price}" %></li>
     <% end %>
   </ul>
 </div>

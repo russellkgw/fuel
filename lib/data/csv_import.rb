@@ -20,7 +20,6 @@ class Data::CsvImport
   end
 
   def valid_file?(expected_structure, data)
-    # byebug
     data.present? && header_count_valid?(expected_structure.keys, data.first) &&
         header_order_valid?(expected_structure.keys, data.first) && col_data_valid?(data, expected_structure.values)
   end

@@ -1,5 +1,4 @@
 class Data::ExchangeRateImport < Data::CsvImport
-
   STRUCTURE = { 'Base' => { type: 'String', permitted: ['USD'] },
                 'Currency' => { type: 'String', permitted: ['ZAR'] },
                 'Value' => { type: 'Decimal', permitted: [] },
