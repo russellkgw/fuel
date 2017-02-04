@@ -13,7 +13,7 @@ module Fuel
     # -- all .rb files in that directory are automatically loaded.
 
     # Make use of structure.sql over schema.rb
-    config.active_record.schema_format = :sql
+    # config.active_record.schema_format = :sql
 
     # Custom directories with classes and modules you want to be autoloadable.
     config.autoload_paths += [Rails.root.join('lib')]

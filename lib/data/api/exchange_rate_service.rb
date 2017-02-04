@@ -36,10 +36,15 @@ class Data::Api::ExchangeRateService
 
   def call_dev
     prev_date = Date.today - 1
-    prev_month = prev_date - 1.month
+    start_date = ExchangeRate.order(date: :desc).first.date + 1
 
-    (prev_month..prev_date).each do |date|
+    return if start_date > prev_date
+
+    (start_date..prev_date).each do |date|
       next if date_data_exists?(date)
+
+      puts ('call exchange for: ' + date.to_s)
+
       uri = URI("https://openexchangerates.org/api/historical/#{date.to_s}.json?app_id=#{Rails.application.secrets.exchange_key}&base=USD")
       service_request = Net::HTTP.get_response(uri)
 
@@ -60,6 +65,6 @@ class Data::Api::ExchangeRateService
   end
 
   def date_data_exists?(date)
-    ExchangeRate.where(date: date).any?
+    ExchangeRate.where(date: date, source: 'https://openexchangerates.org/').any?
   end
 end
