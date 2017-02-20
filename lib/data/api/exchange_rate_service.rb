@@ -50,6 +50,7 @@ class Data::Api::ExchangeRateService
 
       if service_request.response.is_a?(Net::HTTPSuccess)
         save_exchange_rate(JSON.parse(service_request.body).to_h['rates']['ZAR'], date)
+        puts ('SUCCESS!')
       else
         raise IntegrationError.new("Unable to successfully call openexchangerate.org, error: #{service_request.body.to_s}")
       end

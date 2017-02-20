@@ -25,6 +25,8 @@ class Data::Api::OilPriceService
     start_date = OilPrice.order(date: :desc).first.date + 1 # prev_date - 1.month
 
     return if start_date > prev_date
+
+    puts ("call oil prices for: #{start_date.to_s} - #{prev_date.to_s}")
     
     uri = URI("https://www.quandl.com/api/v3/datasets/EIA/PET_RBRTE_D.json?api_key=#{Rails.application.secrets.oil_price_key}&start_date=#{start_date.to_s}&end_date=#{prev_date.to_s}")
     service_request = Net::HTTP.get_response(uri)
@@ -32,6 +34,7 @@ class Data::Api::OilPriceService
     if service_request.response.is_a?(Net::HTTPSuccess)
       data = JSON.parse(service_request.body).to_h['dataset']['data']
       save_oil_price(data) if data.any?
+      puts ('SUCCESS!')
     else
       raise IntegrationError.new("Unable to successfully call oil price api, error: #{service_request.body.to_s}")
     end
