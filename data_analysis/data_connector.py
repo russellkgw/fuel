@@ -14,12 +14,12 @@ current_date = date.today()
 start_date = date(1995, 10, 28)
 end_date = date(1995, 11, 27)
 
-monthly_exchange_rates = []
+exchange_rate_changes = []
 
 while (start_date <= current_date):
-  ave_rate = fd.exchange_rate_cycle(start_date, end_date)
-  monthly_exchange_rates.append([start_date, end_date, ave_rate])
-  
+  rate_change = fd.exchange_rate_cycle_change(start_date, end_date)
+  exchange_rate_changes.append([start_date, end_date, rate_change])
+
   start_date = start_date + relativedelta(months=1)
   end_date = end_date + relativedelta(months=1)
 
@@ -29,11 +29,11 @@ while (start_date <= current_date):
 start_date = date(1995, 10, 28)
 end_date = date(1995, 11, 27)
 
-monthly_oil_prices = []
+oil_price_changes = []
 
 while (start_date <= current_date):
-  ave_price = fd.oil_price_cycle(start_date, end_date)
-  monthly_oil_prices.append([start_date, end_date, ave_price])
+  change_price = fd.oil_price_cycle_change(start_date, end_date)
+  oil_price_changes.append([start_date, end_date, change_price])
   
   start_date = start_date + relativedelta(months=1)
   end_date = end_date + relativedelta(months=1)
