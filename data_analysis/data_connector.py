@@ -22,7 +22,7 @@ class DataConnector(object):
       rate_change = fd.exchange_rate_cycle_change(start_date, end_date)
       exchange_rate_changes.append(rate_change) # [start_date, end_date, rate_change]
 
-      print(str(start_date) + ' ' + str(end_date) + ' ' + str(rate_change))
+      # print(str(start_date) + ' ' + str(end_date) + ' ' + str(rate_change))
 
       start_date = start_date + relativedelta(months=1)
       end_date = end_date + relativedelta(months=1)
@@ -41,6 +41,8 @@ class DataConnector(object):
     while (start_date <= self.current_date):
       change_price = fd.oil_price_cycle_change(start_date, end_date)
       oil_price_changes.append(change_price) # [start_date, end_date, change_price]
+
+      # print(str(start_date) + ' ' + str(end_date) + ' ' + str(change_price))
       
       start_date = start_date + relativedelta(months=1)
       end_date = end_date + relativedelta(months=1)
@@ -59,6 +61,8 @@ class DataConnector(object):
     while (start_date <= self.current_date):
       fuel_price_change = fd.fuel_price_cycle_change(start_date, end_date)
       fuel_price_changes.append(fuel_price_change) # [start_date, end_date, fuel_price_change]
+
+      # print(str(start_date) + ' ' + str(end_date) + ' ' + str(fuel_price_change))
       
       start_date = start_date + relativedelta(months=1)
       end_date = end_date + relativedelta(months=1)
