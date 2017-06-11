@@ -17,10 +17,37 @@ LABEL = "fuel_price"
 # Fuel data
 data_conn = DataConnector()
 
-data = {'exchange_rate' : data_conn.exchange_month_changes(), 'oil_price' : data_conn.oil_month_changes(), 'fuel_price' : data_conn.fuel_month_changes()}
+# exchange = data_conn.exchange_month_averages()
+# oil = data_conn.oil_month_averages()
+# fuel = data_conn.fuel_month_value()
+
+exchange = data_conn.exchange_month_changes()
+oil = data_conn.oil_month_changes()
+fuel = data_conn.fuel_month_changes()
+
+exchange_pd = []
+oil_pd = []
+fuel_pd = []
+
+for i in range(255):
+  exchange_pd.append(exchange[i])
+  oil_pd.append(oil[i])
+  fuel_pd.append(fuel[i])
+
+# data = {'exchange_rate' : data_conn.exchange_month_changes(), 'oil_price' : data_conn.oil_month_changes(), 'fuel_price' : data_conn.fuel_month_changes()}
+data = {'exchange_rate' : exchange_pd, 'oil_price' : oil_pd, 'fuel_price' : fuel_pd}
 pd_df = pd.DataFrame(data)
 
-data_predict = {'exchange_rate' : [-3.81961085552, -2.88644589673, 2.87443402768, -3.8108448693, 0.0], 'oil_price' : [-0.00316996249482, -5.91242929015, -2.28643850221, 3.8842197457, 0.0], 'fuel_price' : [4.89972460169, -1.28851450384, -10.4753047139, 8.93068693386, 0.0]}
+exchange_pred_pd = []
+oil_pred_pd = []
+fuel_pred_pd = []
+
+for i in range(235, 255):
+  exchange_pred_pd.append(exchange[i])
+  oil_pred_pd.append(oil[i])
+  fuel_pred_pd.append(fuel[i])
+
+data_predict = {'exchange_rate' : exchange_pred_pd, 'oil_price' : oil_pred_pd, 'fuel_price' : fuel_pred_pd}
 pd_df_pred = pd.DataFrame(data_predict)
 
 def input_fn(data_set):
@@ -43,10 +70,10 @@ def main(unused_argv):
 
   # Build 2 layer fully connected DNN with 10, 10 units respectively.
   regressor = tf.contrib.learn.DNNRegressor(feature_columns=feature_cols,
-                                            hidden_units=[20, 20, 20, 20, 20, 20])
+                                            hidden_units=[50, 50, 50, 50, 50, 50])
 
   # Fit
-  regressor.fit(input_fn=lambda: input_fn(training_set), steps=100000)
+  regressor.fit(input_fn=lambda: input_fn(training_set), steps=20000)
 
   # Score accuracy
   # ev = regressor.evaluate(input_fn=lambda: input_fn(test_set), steps=1)
@@ -56,8 +83,9 @@ def main(unused_argv):
   # Print out predictions
   y = regressor.predict(input_fn=lambda: input_fn(prediction_set))
   # .predict() returns an iterator; convert to a list and print predictions
-  predictions = list(itertools.islice(y, 5))
+  predictions = list(itertools.islice(y, 20))
   print("Predictions: {}".format(str(predictions)))
+  print("Actual vals: " + str(fuel_pred_pd))
 
 if __name__ == "__main__":
   tf.app.run()

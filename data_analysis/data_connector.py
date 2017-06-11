@@ -20,15 +20,30 @@ class DataConnector(object):
 
     while (start_date <= self.current_date):
       rate_change = fd.exchange_rate_cycle_change(start_date, end_date)
-      exchange_rate_changes.append(rate_change) # [start_date, end_date, rate_change]
-
-      # print(str(start_date) + ' ' + str(end_date) + ' ' + str(rate_change))
+      exchange_rate_changes.append(rate_change)
 
       start_date = start_date + relativedelta(months=1)
       end_date = end_date + relativedelta(months=1)
     
     fd.close_db_connection()
     return exchange_rate_changes
+
+  def exchange_month_averages(self):
+    fd = FuelData(self.con_string)
+    start_date = date(1995, 10, 28)
+    end_date = date(1995, 11, 27)
+
+    exchange_rate_averages = []
+
+    while (start_date <= self.current_date):
+      rate_average = fd.exchange_rate_cycle_average(start_date, end_date)
+      exchange_rate_averages.append(rate_average)
+
+      start_date = start_date + relativedelta(months=1)
+      end_date = end_date + relativedelta(months=1)
+    
+    fd.close_db_connection()
+    return exchange_rate_averages
 
   # Oil prices
   def oil_month_changes(self):
@@ -40,9 +55,7 @@ class DataConnector(object):
 
     while (start_date <= self.current_date):
       change_price = fd.oil_price_cycle_change(start_date, end_date)
-      oil_price_changes.append(change_price) # [start_date, end_date, change_price]
-
-      # print(str(start_date) + ' ' + str(end_date) + ' ' + str(change_price))
+      oil_price_changes.append(change_price)
       
       start_date = start_date + relativedelta(months=1)
       end_date = end_date + relativedelta(months=1)
@@ -50,7 +63,24 @@ class DataConnector(object):
     fd.close_db_connection()
     return oil_price_changes
 
-# Fuel Prices
+  def oil_month_averages(self):
+    fd = FuelData(self.con_string)
+    start_date = date(1995, 10, 28)
+    end_date = date(1995, 11, 27)
+
+    oil_price_averages = []
+
+    while (start_date <= self.current_date):
+      change_average = fd.oil_price_cycle_average(start_date, end_date)
+      oil_price_averages.append(change_average)
+      
+      start_date = start_date + relativedelta(months=1)
+      end_date = end_date + relativedelta(months=1)
+    
+    fd.close_db_connection()
+    return oil_price_averages
+
+  # Fuel Prices
   def fuel_month_changes(self):
     fd = FuelData(self.con_string)
     start_date = date(1995, 12, 1)
@@ -60,12 +90,25 @@ class DataConnector(object):
 
     while (start_date <= self.current_date):
       fuel_price_change = fd.fuel_price_cycle_change(start_date, end_date)
-      fuel_price_changes.append(fuel_price_change) # [start_date, end_date, fuel_price_change]
-
-      # print(str(start_date) + ' ' + str(end_date) + ' ' + str(fuel_price_change))
+      fuel_price_changes.append(fuel_price_change)
       
       start_date = start_date + relativedelta(months=1)
       end_date = end_date + relativedelta(months=1)
 
     fd.close_db_connection()
     return fuel_price_changes
+
+  def fuel_month_value(self):
+    fd = FuelData(self.con_string)
+    start_date = date(1995, 12, 1)
+
+    fuel_price_values = []
+
+    while (start_date <= self.current_date):
+      fuel_price_value = fd.fuel_price_month_value(start_date)
+      fuel_price_values.append(fuel_price_value)
+      
+      start_date = start_date + relativedelta(months=1)
+
+    fd.close_db_connection()
+    return fuel_price_values

@@ -31,8 +31,8 @@ class FuelData(object):
     rates = self.db_con.execute("SELECT date, rate FROM exchange_rates WHERE CAST(STRFTIME('%w', date) AS INTEGER) IN (1, 2, 3, 4, 5) AND date >= '" + str(start_date) + "' AND date <= '" + str(end_date) + "' ORDER BY date;").fetchall()
     return self.percent_change(rates)
 
-  # def exchange_rate_cycle_average(self, start_date, end_date):
-  #   return self.db_con.execute("SELECT AVG(rate) FROM exchange_rates WHERE CAST(STRFTIME('%w', date) AS INTEGER) IN (1, 2, 3, 4, 5) AND date >= '" + str(start_date) + "' AND date <= '" + str(end_date) + "';").fetchone()[0]
+  def exchange_rate_cycle_average(self, start_date, end_date):
+    return self.db_con.execute("SELECT AVG(rate) FROM exchange_rates WHERE CAST(STRFTIME('%w', date) AS INTEGER) IN (1, 2, 3, 4, 5) AND date >= '" + str(start_date) + "' AND date <= '" + str(end_date) + "';").fetchone()[0]
 
   # Oil prices
 
@@ -43,8 +43,8 @@ class FuelData(object):
     prices = self.db_con.execute("SELECT date, price FROM oil_prices WHERE CAST(STRFTIME('%w', date) AS INTEGER) IN (1, 2, 3, 4, 5) AND date >= '" + str(start_date) + "' AND date <= '" + str(end_date) + "' ORDER BY date;").fetchall()
     return self.percent_change(prices)
 
-  # def oil_price_cycle_average(self, start_date, end_date):
-  #   return self.db_con.execute("SELECT AVG(price) FROM oil_prices WHERE CAST(STRFTIME('%w', date) AS INTEGER) IN (1, 2, 3, 4, 5) AND date >= '" + str(start_date) + "' AND date <= '" + str(end_date) + "';").fetchone()[0]
+  def oil_price_cycle_average(self, start_date, end_date):
+    return self.db_con.execute("SELECT AVG(price) FROM oil_prices WHERE CAST(STRFTIME('%w', date) AS INTEGER) IN (1, 2, 3, 4, 5) AND date >= '" + str(start_date) + "' AND date <= '" + str(end_date) + "';").fetchone()[0]
 
   # Fuel Prices
 
@@ -54,3 +54,10 @@ class FuelData(object):
   def fuel_price_cycle_change(self, start_date, end_date):
     prices = self.db_con.execute("SELECT date, basic_fuel_price FROM fuel_prices WHERE date = '" + str(start_date) + "' OR date = '" + str(end_date) + "' ORDER BY date;").fetchall()
     return self.percent_change(prices)
+
+  def fuel_price_month_value(self, start_date):
+    res = self.db_con.execute("SELECT basic_fuel_price FROM fuel_prices WHERE date = '" + str(start_date) + "';").fetchone()
+    if res is None:
+      return 0.0
+    else:
+      return self.db_con.execute("SELECT basic_fuel_price FROM fuel_prices WHERE date = '" + str(start_date) + "';").fetchone()[0]
