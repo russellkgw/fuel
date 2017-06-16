@@ -3,7 +3,9 @@ namespace :api_services do
   desc "Call services"
   task make_call: :environment do
     Data::Api::ExchangeRateService.call_service
+    Data::Api::ExchangeRateFutureService.call_service
     Data::Api::OilPriceService.call_service
+    Data::Api::OilFutureService.call_service
   end
 
   desc "data exchange rate fix"

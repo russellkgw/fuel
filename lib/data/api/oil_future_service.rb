@@ -22,8 +22,7 @@ class Data::Api::OilFutureService
 
   def call
     prev_date = Date.today - 1
-    last_future = OilFuture.order(date: :desc).first
-    start_date = last_future.present? ? last_future.date + 1 : Date.new(1995, 1, 1)
+    start_date = OilFuture.order(date: :desc).first.date + 1
 
     return if start_date > prev_date
 
@@ -45,15 +44,15 @@ class Data::Api::OilFutureService
     data.each do |item|
       next if OilFuture.find_by_date(item[0]).present?
 
-      # OilFuture.create(currency: 'USD',
-      #                  date: item[0],
-      #                  settle: item[4],
-      #                  wave: item[6],
-      #                  volume: item[7],
-      #                  efp_volume: item[9],
-      #                  efs_volume: item[10],
-      #                  block_volume: item[11],
-      #                  source: 'https://www.quandl.com/data/CHRIS/ICE_B1-Brent-Crude-Futures-Continuous-Contract-1-B1-Front-Month')
+      OilFuture.create(currency: 'USD',
+                       date: item[0],
+                       settle: item[4],
+                       wave: item[6],
+                       volume: item[7],
+                       efp_volume: item[9],
+                       efs_volume: item[10],
+                       block_volume: item[11],
+                       source: 'https://www.quandl.com/data/CHRIS/ICE_B1-Brent-Crude-Futures-Continuous-Contract-1-B1-Front-Month')
     end
   end
 end
