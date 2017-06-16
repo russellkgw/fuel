@@ -27,7 +27,7 @@ class Data::Api::OilPriceService
     return if start_date > prev_date
 
     puts ("call oil prices for: #{start_date.to_s} - #{prev_date.to_s}")
-    
+
     uri = URI("https://www.quandl.com/api/v3/datasets/EIA/PET_RBRTE_D.json?api_key=#{Rails.application.secrets.oil_price_key}&start_date=#{start_date.to_s}&end_date=#{prev_date.to_s}")
     service_request = Net::HTTP.get_response(uri)
 

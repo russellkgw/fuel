@@ -10,7 +10,22 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170104201226) do
+ActiveRecord::Schema.define(version: 20170616141420) do
+
+  create_table "exchange_futures", force: :cascade do |t|
+    t.string   "base",         limit: 255
+    t.string   "currency",     limit: 255
+    t.date     "date"
+    t.decimal  "settle"
+    t.decimal  "wave"
+    t.decimal  "volume"
+    t.decimal  "efp_volume"
+    t.decimal  "efs_volume"
+    t.decimal  "block_volume"
+    t.string   "source",       limit: 255
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
+  end
 
   create_table "exchange_rates", force: :cascade do |t|
     t.string   "base",       limit: 255
@@ -45,6 +60,20 @@ ActiveRecord::Schema.define(version: 20170104201226) do
     t.decimal  "slate_levy"
     t.decimal  "delivery_cost"
     t.decimal  "dsml"
+  end
+
+  create_table "oil_futures", force: :cascade do |t|
+    t.string   "currency",     limit: 255
+    t.date     "date"
+    t.decimal  "settle"
+    t.decimal  "wave"
+    t.decimal  "volume"
+    t.decimal  "efp_volume"
+    t.decimal  "efs_volume"
+    t.decimal  "block_volume"
+    t.string   "source",       limit: 255
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
   end
 
   create_table "oil_prices", force: :cascade do |t|
