@@ -17,10 +17,6 @@ LABEL = "fuel_price"
 # Fuel data
 data_conn = DataConnector()
 
-# exchange = data_conn.exchange_month_averages()
-# oil = data_conn.oil_month_averages()
-# fuel = data_conn.fuel_month_value()
-
 exchange = data_conn.exchange_month_changes()
 oil = data_conn.oil_month_changes()
 fuel = data_conn.fuel_month_changes()
@@ -57,23 +53,24 @@ def input_fn(data_set):
 
 def main(unused_argv):
   # Load datasets
-  training_set = pd_df #pd.read_csv("boston_train.csv", skipinitialspace=True, skiprows=1, names=COLUMNS)
-  
-  # test_set = pd.read_csv("boston_test.csv", skipinitialspace=True, skiprows=1, names=COLUMNS)
-
-  # Set of 6 examples for which to predict median house values
-  prediction_set = pd_df_pred # pd.read_csv("boston_predict.csv", skipinitialspace=True, skiprows=1, names=COLUMNS)
+  training_set = pd_df
+  prediction_set = pd_df_pred
 
   # Feature cols
-  feature_cols = [tf.contrib.layers.real_valued_column(k)
-                  for k in FEATURES]
+  feature_cols = [tf.contrib.layers.real_valued_column(k) for k in FEATURES]
 
-  # Build 2 layer fully connected DNN with 10, 10 units respectively.
-  regressor = tf.contrib.learn.DNNRegressor(feature_columns=feature_cols,
-                                            hidden_units=[50, 50, 50, 50, 50, 50])
+  # Regressor
+  # model = tf.contrib.learn.DNNRegressor(feature_columns=feature_cols,hidden_units=[50, 50, 50, 50, 50, 50])
+  # model.fit(input_fn=lambda: input_fn(training_set), steps=20000)
 
-  # Fit
-  regressor.fit(input_fn=lambda: input_fn(training_set), steps=20000)
+  problem_type = 2 # { 'UNSPECIFIED': 0, 'CLASSIFICATION': 1, 'LINEAR_REGRESSION': 2, 'LOGISTIC_REGRESSION': 3 }
+  prediction_type = { 'SINGLE_VALUE': 1, 'MULTIPLE_VALUE': 2 }
+
+
+  # Recurrent
+  model = tf.contrib.learn.DynamicRnnEstimator(tf.contrib.learn.ProblemType.LINEAR_REGRESSION, tf.contrib.learn.ProblemType.LINEAR_REGRESSION, feature_cols)
+
+  # print(str(tf.contrib.learn.ProblemType.LINEAR_REGRESSION))
 
   # Score accuracy
   # ev = regressor.evaluate(input_fn=lambda: input_fn(test_set), steps=1)
@@ -81,11 +78,11 @@ def main(unused_argv):
   # print("Loss: {0:f}".format(loss_score))
 
   # Print out predictions
-  y = regressor.predict(input_fn=lambda: input_fn(prediction_set))
+  # y = model.predict(input_fn=lambda: input_fn(prediction_set))
   # .predict() returns an iterator; convert to a list and print predictions
-  predictions = list(itertools.islice(y, 20))
-  print("Predictions: {}".format(str(predictions)))
-  print("Actual vals: " + str(fuel_pred_pd))
+  # predictions = list(itertools.islice(y, 20))
+  # print("Predictions: {}".format(str(predictions)))
+  # print("Actual vals: " + str(fuel_pred_pd))
 
 if __name__ == "__main__":
   tf.app.run()
