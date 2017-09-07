@@ -47,7 +47,7 @@ pd_df_pred = pd.DataFrame(data_predict)
 
 
 def input_fn(data_set):
-  feature_cols = {k: tf.constant(data_set[k].values) for k in FEATURES}
+  feature_cols = {k: tf.constant(data_set[k].values, shape=[data_set[k].size, 1]) for k in FEATURES}
   labels = tf.constant(data_set[LABEL].values)
   return feature_cols, labels
 
@@ -59,8 +59,8 @@ def main(unused_argv):
   # Feature cols
   feature_cols = [tf.contrib.layers.real_valued_column(k) for k in FEATURES]
 
-  model = tf.contrib.learn.DNNRegressor(feature_columns=feature_cols,hidden_units=[30, 30, 30])
-  model.fit(input_fn=lambda: input_fn(training_set), steps=15000)
+  model = tf.contrib.learn.DNNRegressor(feature_columns=feature_cols,hidden_units=[10, 10, 10])
+  model.fit(input_fn=lambda: input_fn(training_set), steps=10000)
 
   # Score accuracy
   # ev = model.evaluate(input_fn=lambda: input_fn(test_set), steps=1) # test_set = pd.read_csv("boston_test.csv", skipinitialspace=True, skiprows=1, names=COLUMNS)
