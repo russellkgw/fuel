@@ -34,6 +34,12 @@ class FuelData(object):
   def exchange_rate_cycle_average(self, start_date, end_date):
     return self.db_con.execute("SELECT AVG(rate) FROM exchange_rates WHERE CAST(STRFTIME('%w', date) AS INTEGER) IN (1, 2, 3, 4, 5) AND date >= '" + str(start_date) + "' AND date <= '" + str(end_date) + "';").fetchone()[0]
 
+  # Exchange rate futures
+
+  def exchange_rate_future_cycle_change(self, start_date, end_date):
+    rates = self.db_con.execute("SELECT date, settle FROM exchange_futures WHERE CAST(STRFTIME('%w', date) AS INTEGER) IN (1, 2, 3, 4, 5) AND date >= '" + str(start_date) + "' AND date <= '" + str(end_date) + "' ORDER BY date;").fetchall()
+    return self.percent_change(rates)
+  
   # Oil prices
 
   def oil_prices(self):
@@ -45,6 +51,10 @@ class FuelData(object):
 
   def oil_price_cycle_average(self, start_date, end_date):
     return self.db_con.execute("SELECT AVG(price) FROM oil_prices WHERE CAST(STRFTIME('%w', date) AS INTEGER) IN (1, 2, 3, 4, 5) AND date >= '" + str(start_date) + "' AND date <= '" + str(end_date) + "';").fetchone()[0]
+
+  # Oil Futures
+
+
 
   # Fuel Prices
 
