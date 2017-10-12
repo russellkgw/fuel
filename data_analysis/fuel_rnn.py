@@ -19,20 +19,26 @@ data_conn = DataConnector()
 
 exchange = data_conn.exchange_month_changes()
 oil = data_conn.oil_month_changes()
+exchange_future = data_conn.exchange_future_month_changes()
+oil_future = data_conn.oil_future_month_changes()
 fuel = data_conn.fuel_month_changes()
 
 exchange_pd = exchange[:255]
 oil_pd = oil[:255]
+exchange_f_pd = exchange_future[:255]
+oil_f_pd = oil_future[:255]
 fuel_pd = fuel[:255]
 
-data = {'exchange_rate' : exchange_pd, 'oil_price' : oil_pd, 'fuel_price' : fuel_pd}
+data = {'exchange_rate' : exchange_pd, 'oil_price' : oil_pd, 'exchange_future' : exchange_f_pd, 'oil_future' : oil_f_pd, 'fuel_price' : fuel_pd}
 pd_df = pd.DataFrame(data)
 
 exchange_pred_pd = exchange[235:255]
 oil_pred_pd = oil[235:255]
+exchange_f_pred_pd = exchange_future[235:255]
+oil_f_pred_pd = oil_future[235:255]
 fuel_pred_pd = fuel[235:255]
 
-data_predict = {'exchange_rate' : exchange_pred_pd, 'oil_price' : oil_pred_pd, 'fuel_price' : fuel_pred_pd}
+data_predict = {'exchange_rate' : exchange_pred_pd, 'oil_price' : oil_pred_pd, 'exchange_future' : exchange_f_pred_pd, 'oil_future' : oil_f_pred_pd, 'fuel_price' : fuel_pred_pd}
 pd_df_pred = pd.DataFrame(data_predict)
 
 BATCH_SIZE = 32
@@ -76,29 +82,10 @@ def main(unused_argv):
   # feature_cols = {k: tf.constant(training_set[k].values, shape=[training_set[k].size, 1]) for k in FEATURES}
   # print('FEATURE COLS: ' + str(feature_cols))
   
-  model.fit(input_fn=lambda: input_fn(training_set), steps=10000)
-
-  # x = tf.random_uniform([BATCH_SIZE, SEQUENCE_LENGTH])
-  # print('x: ' + str(x))
-  # y = tf.reduce_mean(x, axis=1)
-  # print('y: ' + str(y))
-  # x = tf.expand_dims(x, axis=2)
-  # print('x: ' + str(x))
-
+  # model.fit(input_fn=lambda: input_fn(training_set), steps=10000)
 
   # xc = tf.contrib.layers.real_valued_column("")
   # print('xc:' + str(xc))
-  # estimator = tf.contrib.learn.DynamicRnnEstimator(problem_type = tf.contrib.learn.ProblemType.LINEAR_REGRESSION,
-  #                                                prediction_type = prediction_type['SINGLE_VALUE'],
-  #                                                sequence_feature_columns = [xc],
-  #                                                context_feature_columns = None,
-  #                                                num_units = 5,
-  #                                                cell_type = 'lstm', 
-  #                                                optimizer = 'SGD',
-  #                                                learning_rate = 0.1)
-
-  # estimator.fit(input_fn=get_train_inputs, steps=100)
-
 
   # Score accuracy
   # ev = regressor.evaluate(input_fn=lambda: input_fn(test_set), steps=1)

@@ -3,7 +3,7 @@ class Data::Api::OilPriceFix
     missing_date = []
     oil_prices = OilPrice.where("date >= '1995-01-01'").order(date: :asc).all.select { |x| x.date.cwday <= 5 }
 
-    (Date.new(1995, 1, 1)..(Date.current - 1.day)).each do |date|
+    (Date.new(1995, 1, 1)..(oil_prices.last.date)).each do |date|
       next if date.cwday >= 6
       missing_date << date if oil_prices.select { |x| x.date == date }.empty?
     end

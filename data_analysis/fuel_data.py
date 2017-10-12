@@ -18,9 +18,15 @@ class FuelData(object):
     for i, val in enumerate(items):
       if ((i + 1) <= (len(items) - 1)):
         a, b = val[1], items[i + 1][1]
-        res = res + ((b - a) / a)
+        if a is None or b is None:
+          continue
+        else:
+          res = res + ((b - a) / a)
 
-    return res * 100.0
+    if res is None:
+      return None
+    else:
+      return res * 100.0
 
   # Exchange rates
 
@@ -36,7 +42,7 @@ class FuelData(object):
 
   # Exchange rate futures
 
-  def exchange_rate_future_cycle_change(self, start_date, end_date):
+  def exchange_future_cycle_change(self, start_date, end_date):
     rates = self.db_con.execute("SELECT date, settle FROM exchange_futures WHERE CAST(STRFTIME('%w', date) AS INTEGER) IN (1, 2, 3, 4, 5) AND date >= '" + str(start_date) + "' AND date <= '" + str(end_date) + "' ORDER BY date;").fetchall()
     return self.percent_change(rates)
   
@@ -54,7 +60,9 @@ class FuelData(object):
 
   # Oil Futures
 
-
+  def oil_future_cycle_change(self, start_date, end_date):
+    rates = self.db_con.execute("SELECT date, settle FROM oil_futures WHERE CAST(STRFTIME('%w', date) AS INTEGER) IN (1, 2, 3, 4, 5) AND date >= '" + str(start_date) + "' AND date <= '" + str(end_date) + "' ORDER BY date;").fetchall()
+    return self.percent_change(rates)
 
   # Fuel Prices
 

@@ -4,6 +4,7 @@ from dateutil import parser
 from dateutil.relativedelta import relativedelta
 import sqlite3
 
+
 class DataConnector(object):
 
   def __init__(self):
@@ -45,6 +46,24 @@ class DataConnector(object):
     fd.close_db_connection()
     return exchange_rate_averages
 
+  # Exchange futures
+  def exchange_future_month_changes(self):
+    fd = FuelData(self.con_string)
+    start_date = date(1995, 11, 28) # add offset (2wks)
+    end_date = date(1995, 12, 27) # add offset (2wks)
+
+    exchange_future_changes = []
+
+    while (start_date <= self.current_date):
+      future_change = fd.exchange_future_cycle_change(start_date, end_date)
+      exchange_future_changes.append(future_change)
+
+      start_date = start_date + relativedelta(months=1)
+      end_date = end_date + relativedelta(months=1)
+    
+    fd.close_db_connection()
+    return exchange_future_changes
+  
   # Oil prices
   def oil_month_changes(self):
     fd = FuelData(self.con_string)
@@ -80,6 +99,24 @@ class DataConnector(object):
     fd.close_db_connection()
     return oil_price_averages
 
+  # Oil Future
+  def oil_future_month_changes(self):
+    fd = FuelData(self.con_string)
+    start_date = date(1995, 11, 28) # add 2wk offest
+    end_date = date(1995, 12, 27) # add 2wk offest
+
+    oil_future_changes = []
+
+    while (start_date <= self.current_date):
+      change_future = fd.oil_future_cycle_change(start_date, end_date)
+      oil_future_changes.append(change_future)
+      
+      start_date = start_date + relativedelta(months=1)
+      end_date = end_date + relativedelta(months=1)
+    
+    fd.close_db_connection()
+    return oil_future_changes
+   
   # Fuel Prices
   def fuel_month_changes(self):
     fd = FuelData(self.con_string)
