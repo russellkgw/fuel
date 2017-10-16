@@ -9,9 +9,9 @@
 
 # IDE
 /.idea
+data_analysis/.idea
 
 # Ruby and Rails
-.ruby-version
 .ruby-gemset
 config/secrets.yml
 config/database.yml

@@ -10,10 +10,6 @@ import tensorflow as tf
 # TF logging
 tf.logging.set_verbosity(tf.logging.INFO)
 
-COLUMNS = ["exchange_rate", "oil_price", "fuel_price"]
-FEATURES = ["exchange_rate", "oil_price"]
-LABEL = "fuel_price"
-
 # Fuel data
 data_conn = DataConnector()
 
@@ -23,81 +19,56 @@ exchange_future = data_conn.exchange_future_month_changes()
 oil_future = data_conn.oil_future_month_changes()
 fuel = data_conn.fuel_month_changes()
 
-exchange_pd = exchange[:255]
-oil_pd = oil[:255]
-exchange_f_pd = exchange_future[:255]
-oil_f_pd = oil_future[:255]
-fuel_pd = fuel[:255]
+training_set = pd.DataFrame({'exchange_rate': exchange[:235], 'oil_price': oil[:235],
+                             'exchange_future': exchange_future[:235], 'oil_future': oil_future[:235],
+                             'fuel_price': fuel[:235]})
 
-data = {'exchange_rate' : exchange_pd, 'oil_price' : oil_pd, 'exchange_future' : exchange_f_pd, 'oil_future' : oil_f_pd, 'fuel_price' : fuel_pd}
-pd_df = pd.DataFrame(data)
+test_set = pd.DataFrame({'exchange_rate': exchange[235:255], 'oil_price': oil[235:255],
+                         'exchange_future': exchange_future[235:255], 'oil_future': oil_future[235:255],
+                         'fuel_price': fuel[235:255]})
 
-exchange_pred_pd = exchange[235:255]
-oil_pred_pd = oil[235:255]
-exchange_f_pred_pd = exchange_future[235:255]
-oil_f_pred_pd = oil_future[235:255]
-fuel_pred_pd = fuel[235:255]
+COLUMNS = ["exchange_rate", "oil_price", "fuel_price"]
+FEATURES = ["exchange_rate", "oil_price"]
+LABEL = "fuel_price"
 
-data_predict = {'exchange_rate' : exchange_pred_pd, 'oil_price' : oil_pred_pd, 'exchange_future' : exchange_f_pred_pd, 'oil_future' : oil_f_pred_pd, 'fuel_price' : fuel_pred_pd}
-pd_df_pred = pd.DataFrame(data_predict)
+# BATCH_SIZE = 32
+# SEQUENCE_LENGTH = 16
 
-BATCH_SIZE = 32
-SEQUENCE_LENGTH = 16
+# import pdb; pdb.set_trace()
 
-
-# If you specify the shape of your tensor explicitly:
-# tf.constant(df[k].values, shape=[df[k].size, 1])  # {k: tf.constant(df[k].values, shape=[df[k].size, 1]) for k in CONTINUOUS_COLUMNS}
-# the warning should go away.
 
 def input_fn(data_set):
-  feature_cols = {k: tf.constant(data_set[k].values, shape=[data_set[k].size, 1]) for k in FEATURES}
-  labels = tf.constant(data_set[LABEL].values)
-  return feature_cols, labels
+    feature_columns = {k: tf.constant(data_set[k], shape=[data_set[k].size, 1]) for k in FEATURES}
+    labels = tf.constant(data_set[LABEL])
+    return feature_columns, labels
 
-# def get_train_inputs():
-#   x = tf.random_uniform([BATCH_SIZE, SEQUENCE_LENGTH])
-#   y = tf.reduce_mean(x, axis=1)
-#   x = tf.expand_dims(x, axis=2)
-#   return {"": x}, y
 
 def main(unused_argv):
-  # Load datasets
-  training_set = pd_df
-  prediction_set = pd_df_pred
+    feature_cols = [tf.contrib.layers.real_valued_column(k) for k in FEATURES]
+    prediction_type = {'SINGLE_VALUE': 1, 'MULTIPLE_VALUE': 2}  # problem_type = 2 # { 'UNSPECIFIED': 0, 'CLASSIFICATION': 1, 'LINEAR_REGRESSION': 2, 'LOGISTIC_REGRESSION': 3 }
 
-  # Feature cols
-  feature_cols = [tf.contrib.layers.real_valued_column(k) for k in FEATURES]
+    # Recurrent - Mine
+    model = tf.contrib.learn.DynamicRnnEstimator(tf.contrib.learn.ProblemType.LINEAR_REGRESSION,
+                                                 prediction_type['SINGLE_VALUE'],
+                                                 feature_cols,
+                                                 num_units=[10, 10, 10],
+                                                 cell_type='gru',  # 'basic_rnn', 'gru', 'lstm'
+                                                 optimizer='Adagrad',  # 'Adagrad', 'Adam', 'Ftrl', 'Momentum', 'RMSProp', 'SGD'
+                                                 learning_rate=0.1)
 
-  prediction_type = { 'SINGLE_VALUE': 1, 'MULTIPLE_VALUE': 2 } # problem_type = 2 # { 'UNSPECIFIED': 0, 'CLASSIFICATION': 1, 'LINEAR_REGRESSION': 2, 'LOGISTIC_REGRESSION': 3 }
+    # Fit Model
+    model.fit(input_fn=lambda: input_fn(training_set), steps=10000)
 
-  # Recurrent - Mine
-  model = tf.contrib.learn.DynamicRnnEstimator(tf.contrib.learn.ProblemType.LINEAR_REGRESSION, 
-    prediction_type['SINGLE_VALUE'], 
-    feature_cols, 
-    num_units=[10, 10, 10],
-    cell_type='basic_rnn', # 'basic_rnn', 'gru', 'lstm'
-    optimizer='Adagrad', #  'Adagrad', 'Adam', 'Ftrl', 'Momentum', 'RMSProp', 'SGD'
-    learning_rate=0.1)
+    # Test Accuracy
+    model_eval = model.evaluate(input_fn=lambda: input_fn(test_set), steps=10)
+    print("Test Loss: {0:f}".format(model_eval["loss"]))
 
-  # feature_cols = {k: tf.constant(training_set[k].values, shape=[training_set[k].size, 1]) for k in FEATURES}
-  # print('FEATURE COLS: ' + str(feature_cols))
-  
-  # model.fit(input_fn=lambda: input_fn(training_set), steps=10000)
-
-  # xc = tf.contrib.layers.real_valued_column("")
-  # print('xc:' + str(xc))
-
-  # Score accuracy
-  # ev = regressor.evaluate(input_fn=lambda: input_fn(test_set), steps=1)
-  # loss_score = ev["loss"]
-  # print("Loss: {0:f}".format(loss_score))
-
-  # Print out predictions
-  # y = model.predict(input_fn=lambda: input_fn(prediction_set))
-  # .predict() returns an iterator; convert to a list and print predictions
-  # predictions = list(itertools.islice(y, 20))
-  # print("Predictions: {}".format(str(predictions)))
-  # print("Actual vals: " + str(fuel_pred_pd))
+    # Print out predictions
+    # y = model.predict(input_fn=lambda: input_fn(prediction_set))
+    # .predict() returns an iterator; convert to a list and print predictions
+    # predictions = list(itertools.islice(y, 20))
+    # print("Predictions: {}".format(str(predictions)))
+    # print("Actual vals: " + str(fuel_pred_pd))
 
 if __name__ == "__main__":
-  tf.app.run()
+    tf.app.run()
