@@ -25,6 +25,7 @@ namespace :api_services do
 
   desc "data future fix"
   task fix_oil_future: :environment do
-    Data::Api::OilFutureFix.insert_averages
+    # Data::Api::OilFutureFix.insert_averages
+    Data::Api::OilFutureFix.update_blanks
   end
 end

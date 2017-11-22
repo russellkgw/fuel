@@ -21,7 +21,7 @@ class Data::Api::OilFutureFix
     end
 
     fixes.each do |date, settle|
-      next if OilFuture.where(date: date).any?
+      items = OilFuture.where(date: date)
 
       OilFuture.create(currency: 'USD',
                        settle: settle,
@@ -33,5 +33,20 @@ class Data::Api::OilFutureFix
 
     puts missing_dates.to_s
     puts fixes.to_s
+  end
+
+  def self.update_blanks
+    blank_oil_futures = OilFuture.where("date >= '1995-11-01'").order(date: :asc)
+                      .all.select { |x| x.date.on_weekday? && x.settle.blank? }
+
+    blank_oil_futures.each do |fut|
+      before = OilFuture.where("date < ?", fut.date).order(date: :desc).first
+      after = OilFuture.where("date > ?", fut.date).order(date: :asc).first
+
+      if before.present? && after.present?
+        fut.update({settle: ((before.settle + after.settle) / 2.0)})
+        # puts "#{fut.date} - #{((before.settle + after.settle) / 2.0)}"
+      end
+    end
   end
 end

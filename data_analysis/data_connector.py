@@ -1,151 +1,105 @@
 from fuel_data import FuelData
-from datetime import date, timedelta
-from dateutil import parser
+from datetime import date
 from dateutil.relativedelta import relativedelta
-import sqlite3
 
 
 class DataConnector(object):
 
-  def __init__(self):
-    self.con_string = '../db/development.sqlite3'
-    self.current_date = date.today()
-  
-  # Exchange rates
-  def exchange_month_changes(self):
-    fd = FuelData(self.con_string)
-    start_date = date(1995, 11, 28)
-    end_date = date(1995, 12, 27)
+    def __init__(self):
+        self.con_string = '../db/development.sqlite3'
+        self.current_date = date.today()
 
-    exchange_rate_changes = []
+    # Exchange rates
+    def exchange_month_changes(self):
+        fd = FuelData(self.con_string)
+        start_date = date(2003, 12, 28)  # 1995, 11, 28
+        end_date = date(2004, 1, 27)  # 1995, 12, 27
 
-    while (start_date <= self.current_date):
-      rate_change = fd.exchange_rate_cycle_change(start_date, end_date)
-      exchange_rate_changes.append(rate_change)
+        exchange_rate_changes = []
 
-      start_date = start_date + relativedelta(months=1)
-      end_date = end_date + relativedelta(months=1)
-    
-    fd.close_db_connection()
-    return exchange_rate_changes
+        while start_date <= self.current_date:
+            rate_change = fd.exchange_rate_cycle_change(start_date, end_date)
+            exchange_rate_changes.append(rate_change)
 
-  def exchange_month_averages(self):
-    fd = FuelData(self.con_string)
-    start_date = date(1995, 10, 28)
-    end_date = date(1995, 11, 27)
+            start_date = start_date + relativedelta(months=1)
+            end_date = end_date + relativedelta(months=1)
 
-    exchange_rate_averages = []
+        fd.close_db_connection()
+        return exchange_rate_changes
 
-    while (start_date <= self.current_date):
-      rate_average = fd.exchange_rate_cycle_average(start_date, end_date)
-      exchange_rate_averages.append(rate_average)
+    # Exchange futures
+    def exchange_future_month_changes(self):
+        fd = FuelData(self.con_string)
+        start_date = date(2003, 12, 28)  # add offset (2wks) ?  1995, 11, 28
+        end_date = date(2004, 1, 27)  # add offset (2wks) ?  1995, 12, 27
 
-      start_date = start_date + relativedelta(months=1)
-      end_date = end_date + relativedelta(months=1)
-    
-    fd.close_db_connection()
-    return exchange_rate_averages
+        exchange_future_changes = []
 
-  # Exchange futures
-  def exchange_future_month_changes(self):
-    fd = FuelData(self.con_string)
-    start_date = date(1995, 11, 28) # add offset (2wks)
-    end_date = date(1995, 12, 27) # add offset (2wks)
+        while start_date <= self.current_date:
+            future_change = fd.exchange_future_cycle_change(start_date, end_date)
+            exchange_future_changes.append(future_change)
 
-    exchange_future_changes = []
+            start_date = start_date + relativedelta(months=1)
+            end_date = end_date + relativedelta(months=1)
 
-    while (start_date <= self.current_date):
-      future_change = fd.exchange_future_cycle_change(start_date, end_date)
-      exchange_future_changes.append(future_change)
+        fd.close_db_connection()
+        return exchange_future_changes
 
-      start_date = start_date + relativedelta(months=1)
-      end_date = end_date + relativedelta(months=1)
-    
-    fd.close_db_connection()
-    return exchange_future_changes
-  
-  # Oil prices
-  def oil_month_changes(self):
-    fd = FuelData(self.con_string)
-    start_date = date(1995, 11, 28)
-    end_date = date(1995, 12, 27)
+    # Oil prices
+    def oil_month_changes(self):
+        fd = FuelData(self.con_string)
+        start_date = date(2003, 12, 28)  # 1995, 11, 28
+        end_date = date(2004, 1, 27)  # 1995, 12, 27
 
-    oil_price_changes = []
+        oil_price_changes = []
 
-    while (start_date <= self.current_date):
-      change_price = fd.oil_price_cycle_change(start_date, end_date)
-      oil_price_changes.append(change_price)
-      
-      start_date = start_date + relativedelta(months=1)
-      end_date = end_date + relativedelta(months=1)
-    
-    fd.close_db_connection()
-    return oil_price_changes
+        while start_date <= self.current_date:
+            change_price = fd.oil_price_cycle_change(start_date, end_date)
+            oil_price_changes.append(change_price)
 
-  def oil_month_averages(self):
-    fd = FuelData(self.con_string)
-    start_date = date(1995, 10, 28)
-    end_date = date(1995, 11, 27)
+            start_date = start_date + relativedelta(months=1)
+            end_date = end_date + relativedelta(months=1)
 
-    oil_price_averages = []
+        fd.close_db_connection()
+        return oil_price_changes
 
-    while (start_date <= self.current_date):
-      change_average = fd.oil_price_cycle_average(start_date, end_date)
-      oil_price_averages.append(change_average)
-      
-      start_date = start_date + relativedelta(months=1)
-      end_date = end_date + relativedelta(months=1)
-    
-    fd.close_db_connection()
-    return oil_price_averages
+    # Oil Future
+    def oil_future_month_changes(self):
+        fd = FuelData(self.con_string)
+        start_date = date(2003, 12, 28)  # add offset (2wks) ?  1995, 11, 28
+        end_date = date(2004, 1, 27)  # add offset (2wks) ?  1995, 12, 27
 
-  # Oil Future
-  def oil_future_month_changes(self):
-    fd = FuelData(self.con_string)
-    start_date = date(1995, 11, 28) # add 2wk offest
-    end_date = date(1995, 12, 27) # add 2wk offest
+        oil_future_changes = []
 
-    oil_future_changes = []
+        # import pdb;
+        # pdb.set_trace()
 
-    while (start_date <= self.current_date):
-      change_future = fd.oil_future_cycle_change(start_date, end_date)
-      oil_future_changes.append(change_future)
-      
-      start_date = start_date + relativedelta(months=1)
-      end_date = end_date + relativedelta(months=1)
-    
-    fd.close_db_connection()
-    return oil_future_changes
-   
-  # Fuel Prices
-  def fuel_month_changes(self):
-    fd = FuelData(self.con_string)
-    start_date = date(1995, 12, 1)
-    end_date = date(1996, 1, 1)
+        while start_date <= self.current_date:
+            change_future = fd.oil_future_cycle_change(start_date, end_date)
+            oil_future_changes.append(change_future)
 
-    fuel_price_changes = []
+            # print('start date: ' + str(start_date) + ' end date: ' + str(end_date))
 
-    while (start_date <= self.current_date):
-      fuel_price_change = fd.fuel_price_cycle_change(start_date, end_date)
-      fuel_price_changes.append(fuel_price_change)
-      
-      start_date = start_date + relativedelta(months=1)
-      end_date = end_date + relativedelta(months=1)
+            start_date = start_date + relativedelta(months=1)
+            end_date = end_date + relativedelta(months=1)
 
-    fd.close_db_connection()
-    return fuel_price_changes
+        fd.close_db_connection()
+        return oil_future_changes
 
-  def fuel_month_value(self):
-    fd = FuelData(self.con_string)
-    start_date = date(1995, 12, 1)
+    # Fuel Prices
+    def fuel_month_changes(self):
+        fd = FuelData(self.con_string)
+        start_date = date(2004, 1, 1)
+        end_date = date(2004, 2, 1)
 
-    fuel_price_values = []
+        fuel_price_changes = []
 
-    while (start_date <= self.current_date):
-      fuel_price_value = fd.fuel_price_month_value(start_date)
-      fuel_price_values.append(fuel_price_value)
-      
-      start_date = start_date + relativedelta(months=1)
+        while start_date <= self.current_date:
+            fuel_price_change = fd.fuel_price_cycle_change(start_date, end_date)
+            fuel_price_changes.append(fuel_price_change)
 
-    fd.close_db_connection()
-    return fuel_price_values
+            start_date = start_date + relativedelta(months=1)
+            end_date = end_date + relativedelta(months=1)
+
+        fd.close_db_connection()
+        return fuel_price_changes
