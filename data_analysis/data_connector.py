@@ -12,8 +12,8 @@ class DataConnector(object):
     # Exchange rates
     def exchange_month_changes(self):
         fd = FuelData(self.con_string)
-        start_date = date(2003, 12, 28)  # 1995, 11, 28
-        end_date = date(2004, 1, 27)  # 1995, 12, 27
+        start_date = date(1995, 11, 28)  # 1995, 11, 28 # 2003, 12, 28
+        end_date = date(1995, 12, 27)  # 1995, 12, 27 # 2004, 1, 27
 
         exchange_rate_changes = []
 
@@ -48,8 +48,8 @@ class DataConnector(object):
     # Oil prices
     def oil_month_changes(self):
         fd = FuelData(self.con_string)
-        start_date = date(2003, 12, 28)  # 1995, 11, 28
-        end_date = date(2004, 1, 27)  # 1995, 12, 27
+        start_date = date(1995, 11, 28)  # 1995, 11, 28 # 2003, 12, 28
+        end_date = date(1995, 12, 27)  # 1995, 12, 27 # 2004, 1, 27
 
         oil_price_changes = []
 
@@ -89,8 +89,8 @@ class DataConnector(object):
     # Fuel Prices
     def fuel_month_changes(self):
         fd = FuelData(self.con_string)
-        start_date = date(2004, 1, 1)
-        end_date = date(2004, 2, 1)
+        start_date = date(1995, 12, 1)  # 2004, 1, 1
+        end_date = date(1996, 1, 1)  # 2004, 2, 1
 
         fuel_price_changes = []
 
