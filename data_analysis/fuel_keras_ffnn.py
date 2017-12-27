@@ -5,57 +5,66 @@ import keras
 
 from data_connector import DataConnector
 from keras.models import Sequential
-from keras.layers import Dense, Activation
+from keras.layers import Dense, Activation, SimpleRNN, TimeDistributed
 
 # Data
+# Fuel data
 data_conn = DataConnector()
 
 exchange = data_conn.exchange_month_changes()
 oil = data_conn.oil_month_changes()
+exchange_future = data_conn.exchange_future_month_changes()
+oil_future = data_conn.oil_future_month_changes()
 fuel = data_conn.fuel_month_changes()
 
-x_values = [] #list()
-y_values = []
+data_size_trn = 150
+data_size_tst = 165
 
-for i in range(255):
-  x_values.append(np.array([exchange[i], oil[i]]))
-  y_values.append(fuel[i])
+training_set = pd.DataFrame({'exchange_rate': exchange[:data_size_trn], 'oil_price': oil[:data_size_trn],
+                             'exchange_future': exchange_future[:data_size_trn], 'oil_future': oil_future[:data_size_trn], 'fuel': fuel[:data_size_trn]})
 
-x_values = np.array(x_values)
-y_values = np.array(y_values)
+data = training_set.values
+labels = np.array(fuel[:data_size_trn])
 
-# exchange_pred_pd = []
-# oil_pred_pd = []
-# fuel_pred_pd = []
 
-# for i in range(235, 255):
-#   exchange_pred_pd.append(exchange[i])
-#   oil_pred_pd.append(oil[i])
-#   fuel_pred_pd.append(fuel[i])
+# test_set = pd.DataFrame({'exchange_rate': exchange[data_size_trn:data_size_tst], 'oil_price': oil[data_size_trn:data_size_tst],
+#                          'exchange_future': exchange_future[data_size_trn:data_size_tst],
+#                          'oil_future': oil_future[data_size_trn:data_size_tst],
+#                          'fuel_price': fuel[data_size_trn:data_size_tst]})
 
-# data_predict = {'exchange_rate' : exchange_pred_pd, 'oil_price' : oil_pred_pd, 'fuel_price' : fuel_pred_pd}
-# pd_df_pred = pd.DataFrame(data_predict)
+# import pdb; pdb.set_trace()
 
-# Keras Model
+# FFNN
+
+# model = Sequential()
+
+# model.add(Dense(12, activation='relu', input_dim=4))
+
+# model.add(Dense(6, activation='relu'))
+
+# model.add(Dense(1, activation='sigmoid')) # linear # sigmoid
+# model.compile(optimizer='sgd',
+#               loss='mean_squared_error',
+#               metrics=['accuracy'])
+
+# # # Train the model
+# model.fit(data, labels, epochs=10)
+
+
+# RRNN
 
 model = Sequential()
-model.add(Dense(100, activation='relu', input_dim=2))
-model.add(Dense(200, activation='relu'))
-model.add(Dense(100, activation='relu'))
-model.add(Dense(1, activation='sigmoid'))
-model.compile(optimizer='adam',
-              loss='binary_crossentropy',
+
+model.add(TimeDistributed(Dense(4, input_dim=4)))
+
+model.add(SimpleRNN(units=4, activation='relu', return_sequences=True, input_shape=(4,4)))
+
+model.add(SimpleRNN(units=4, activation='relu', return_sequences=False))
+
+model.add(Dense(1, activation='sigmoid')) # linear # sigmoid
+model.compile(optimizer='sgd',
+              loss='mean_squared_error',
               metrics=['accuracy'])
 
-data = x_values
-labels = y_values
-
-# Train the model
-model.fit(data, labels, epochs=100, batch_size=32)
-
-print("X: " + str(x_values[249]) + " Y: " + str(y_values[249]))
-print("X: " + str(x_values[250]) + " Y: " + str(y_values[250]))
-print("X: " + str(x_values[251]) + " Y: " + str(y_values[251]))
-
-res = model.predict(np.array([x_values[249], x_values[250], x_values[251]]))
-print("Res: " + str(res))
+# # Train the model
+model.fit(data, labels, epochs=10, batch_size=4)
