@@ -27,6 +27,18 @@ class DataConnector(object):
         fd.close_db_connection()
         return exchange_rate_changes
 
+    def exchange_rates(self, fuel_date):
+        fuel_date = str(fuel_date)
+        fd = FuelData(self.con_string)
+        split_date = fuel_date.split('-')
+        end_date = date(int(split_date[0]), int(split_date[1]), 27) - relativedelta(months=1)
+        start_date = end_date - relativedelta(months=3)
+        data = fd.exchange_rates(str(start_date), str(end_date), percentage=True)
+        fd.close_db_connection()
+
+        return data
+
+
     # Exchange futures
     def exchange_future_month_changes(self):
         fd = FuelData(self.con_string)
@@ -63,6 +75,16 @@ class DataConnector(object):
         fd.close_db_connection()
         return oil_price_changes
 
+    def oil_prices(self, fuel_date):
+        fuel_date = str(fuel_date)
+        fd = FuelData(self.con_string)
+        split_date = fuel_date.split('-')
+        end_date = date(int(split_date[0]), int(split_date[1]), 27) - relativedelta(months=1)
+        start_date = end_date - relativedelta(months=3)
+        data = fd.oil_prices(str(start_date), str(end_date), percentage=True)
+        fd.close_db_connection()
+        return data
+    
     # Oil Future
     def oil_future_month_changes(self):
         fd = FuelData(self.con_string)
@@ -87,19 +109,32 @@ class DataConnector(object):
         return oil_future_changes
 
     # Fuel Prices
-    def fuel_month_changes(self):
+    def fuel_month_changes(self, step=1):
         fd = FuelData(self.con_string)
-        start_date = date(1995, 12, 1)  # 2004, 1, 1
-        end_date = date(1996, 1, 1)  # 2004, 2, 1
+        start_date = date(1995, 12, 3)  # 2004, 1, 1
+        end_date = date(1996, 1, 3)  # 2004, 2, 1
 
         fuel_price_changes = []
 
-        while start_date <= self.current_date:
-            fuel_price_change = fd.fuel_price_cycle_change(start_date, end_date)
-            fuel_price_changes.append(fuel_price_change)
+        stop_date = date(2017, 8, 3)
 
+        while start_date <= stop_date:
+            dpp = DatePricePair(end_date, fd.fuel_price_cycle_change(start_date, end_date))
+            fuel_price_changes.append(dpp)
             start_date = start_date + relativedelta(months=1)
             end_date = end_date + relativedelta(months=1)
 
         fd.close_db_connection()
         return fuel_price_changes
+
+    def fuel_prices_dates(self, start_date=None, end_date=None):
+        fd = FuelData(self.con_string)
+        fuel_prices = fd.fuel_prices()
+        fd.close_db_connection()
+        return [DatePricePair(fp[3], fp[1]) for fp in fuel_prices]
+
+
+class DatePricePair():
+    def __init__(self, date, price):
+        self.date = date
+        self.price = price
