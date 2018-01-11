@@ -1,9 +1,9 @@
 class Data::Api::ExchangeRateFix
   def self.insert_averages
     missing_date = []
-    exchange_rates = ExchangeRate.where("date >= '1995-11-01'").order(date: :asc).all.select { |x| x.date.cwday <= 5 }
+    exchange_rates = ExchangeRate.where("date >= '1995-01-01'").order(date: :asc).all.select { |x| x.date.cwday <= 5 }
 
-    (Date.new(1995, 11, 1)..(exchange_rates.last.date)).each do |date|
+    (Date.new(1995, 1, 1)..(exchange_rates.last.date)).each do |date|
       next if date.cwday >= 6
 
       missing_date << date if exchange_rates.select { |x| x.date == date }.empty?
