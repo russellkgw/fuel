@@ -53,18 +53,18 @@ labels = np.array(fuel[:data_size_trn])
 
 # RRNN
 
-model = Sequential()
+# model = Sequential()
 
-model.add(TimeDistributed(Dense(4, input_dim=4)))
+# model.add(TimeDistributed(Dense(4, input_dim=4)))
 
-model.add(SimpleRNN(units=4, activation='relu', return_sequences=True, input_shape=(4,4)))
+# model.add(SimpleRNN(units=4, activation='relu', return_sequences=True, input_shape=(4,4)))
 
-model.add(SimpleRNN(units=4, activation='relu', return_sequences=False))
+# model.add(SimpleRNN(units=4, activation='relu', return_sequences=False))
 
-model.add(Dense(1, activation='sigmoid')) # linear # sigmoid
-model.compile(optimizer='sgd',
-              loss='mean_squared_error',
-              metrics=['accuracy'])
+# model.add(Dense(1, activation='sigmoid')) # linear # sigmoid
+# model.compile(optimizer='sgd',
+#               loss='mean_squared_error',
+#               metrics=['accuracy'])
 
-# # Train the model
-model.fit(data, labels, epochs=10, batch_size=4)
+# # # Train the model
+# model.fit(data, labels, epochs=10, batch_size=4)
