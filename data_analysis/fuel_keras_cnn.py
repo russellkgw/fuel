@@ -1,6 +1,6 @@
 from keras.models import Sequential
 from keras.layers import LSTM, GRU
-from keras.layers import Dense
+from keras.layers import Dense, Conv2D, MaxPooling2D, Flatten
 from keras import optimizers
 import numpy as np
 
@@ -65,28 +65,19 @@ for d in data:
     x1 = norm_array(d['exr'], exr_min, exr_max)
     x2 = norm_array(d['oil'], oil_min, oil_max)
 
-    x = np.append(x1, x2).tolist()
+    x = np.column_stack((x1, x2))
+    x = x.reshape(1, 2, 62, 1)
 
-    x_new = []
-    for i in x:
-        x_new.append(i)
+    # resize as [samples, timesteps, width, height, channels]
+    # x = x.reshape(1, 1, 2, 62, 1)
 
-    y_new = []
-    for i in y:
-        y_new.append(i)
-
-    # x = np.column_stack((x1, x2))
-    # y = np.array(y)
-    
-    # x = np.column_stack((x1, x2))
-    # x = x.reshape(1, 62, 2)
     # y = np.array(y).reshape(1, 1)
     
     # if len(feed_data) == 0:
     #     print(str(d['exr']))
     #     print(str(x1))
 
-    feed_data.append({'date': d['date'], 'x': x_new, 'y': x_new})
+    feed_data.append({'date': d['date'], 'x': x, 'y': y})
 
 
 x_array = []
@@ -101,27 +92,43 @@ print('fp min: ' + str(fp_min)), print('fp max: ' + str(fp_max))
 print('ex min: ' + str(exr_min)), print('ex max: ' + str(exr_max))
 print('o min: ' + str(oil_min)), print('o max: ' + str(oil_max))
 
+cnn = Sequential()
+cnn.add(Conv2D(1, (2,2), activation='relu', padding='same', input_shape=(2,62,1))) # ([width, height, channels])
+cnn.add(MaxPooling2D(pool_size=(2, 2)))
+cnn.add(Flatten())
+cnn.add(Dense(10, activation='relu'))
+cnn.add(Dense(1))
+
+cnn.compile(loss='mse', optimizer='sgd', metrics=['acc'])
+print(cnn.summary())
+
+# data[0]
+
+test_x = feed_data[0]['x']
+print('x shape: ' + str(test_x.shape))
+
+test_y = feed_data[0]['y']
+cnn.fit(test_x, test_y, verbose=2)
+
+for e in range(10):  # 100
+    print('Epoch: ' + str(e))
+    for d in feed_data:
+        cnn.fit(d['x'], d['y'], verbose=2)
 
 # import pdb; pdb.set_trace()
-model = Sequential()  # dropout=0.1, recurrent_dropout=0.1
-model.add(Dense(124, activation='relu', input_dim=124))
-model.add(Dense(248, activation='relu'))
-model.add(Dense(124, activation='relu'))
-model.add(Dense(62, activation='relu'))
-model.add(Dense(31, activation='relu'))
-model.add(Dense(1, activation='linear'))
-# sgd = optimizers.SGD(lr=0.1)  # , decay=1e-6, momentum=0.9, nesterov=True
-model.compile(loss='mse', optimizer='sgd', metrics=['acc'])  # adagrad adam sgd rmsprop
-# print(model.summary())
+# model = Sequential()  # dropout=0.1, recurrent_dropout=0.1
+# model.add(Dense(124, activation='relu', input_dim=124))
+# model.add(Dense(248, activation='relu'))
+# model.add(Dense(124, activation='relu'))
+# model.add(Dense(62, activation='relu'))
+# model.add(Dense(31, activation='relu'))
+# model.add(Dense(1, activation='linear'))
+# # sgd = optimizers.SGD(lr=0.1)  # , decay=1e-6, momentum=0.9, nesterov=True
+# model.compile(loss='mse', optimizer='sgd', metrics=['acc'])  # adagrad adam sgd rmsprop
+# # print(model.summary())
 
 # import pdb; pdb.set_trace()
-# r = 1
 
-model.fit(x_array, y_array, verbose=2, epochs=100)
-# for epoch in range(10):
-#     # model.fit(x_array, y_array, verbose=2)
-#     for i in range(200):
-#         model.fit(x_array[i], y_array[i], verbose=2)
 
 # model.fit(x_array, y_array, verbose=2, epochs=1000)
 
