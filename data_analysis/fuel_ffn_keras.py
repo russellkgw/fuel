@@ -2,8 +2,6 @@ from keras.models import Sequential
 from keras.layers import LSTM, GRU
 from keras.layers import Dense
 from keras import optimizers
-# from pandas import Series
-# from sklearn.preprocessing import MinMaxScaler
 import numpy as np
 
 
@@ -67,15 +65,36 @@ for d in data:
     x1 = norm_array(d['exr'], exr_min, exr_max)
     x2 = norm_array(d['oil'], oil_min, oil_max)
 
-    x = np.column_stack((x1, x2))
-    x = x.reshape(1, 62, 2)
-    y = np.array(y).reshape(1, 1)
+    x = np.append(x1, x2).tolist()
+
+    x_new = []
+    for i in x:
+        x_new.append(i)
+
+    y_new = []
+    for i in y:
+        y_new.append(i)
+
+    # x = np.column_stack((x1, x2))
+    # y = np.array(y)
+    
+    # x = np.column_stack((x1, x2))
+    # x = x.reshape(1, 62, 2)
+    # y = np.array(y).reshape(1, 1)
     
     # if len(feed_data) == 0:
     #     print(str(d['exr']))
     #     print(str(x1))
 
-    feed_data.append({'date': d['date'], 'x': x, 'y': y})
+    feed_data.append({'date': d['date'], 'x': x_new, 'y': x_new})
+
+
+x_array = []
+y_array = []
+
+for item in feed_data:
+    x_array.append(item['x'])
+    y_array.append(item['y'][0])
 
 
 print('fp min: ' + str(fp_min)), print('fp max: ' + str(fp_max))
@@ -83,31 +102,32 @@ print('ex min: ' + str(exr_min)), print('ex max: ' + str(exr_max))
 print('o min: ' + str(oil_min)), print('o max: ' + str(oil_max))
 
 
-# NB!!!
-# Keras provides exibility to decouple the resetting of internal state from updates to network
-# weights by dening an LSTM layer as stateful. This can be done by setting the stateful
-# argument on the LSTM layer to True. When stateful LSTM layers are used, you must also
-# dene the batch size as part of the input shape in the denition of the network by setting the
-# batch input shape argument and the batch size must be a factor of the number of samples in
-# the training dataset. The batch input shape argument requires a 3-dimensional tuple dened
-# as batch size, time steps, and features.
-# For example, we can dene a stateful LSTM to be trained on a training dataset with 100
-# samples, a batch size of 10, and 5 time steps for 1 feature, as follows.
-# model.add(LSTM(2, stateful=True, batch_input_shape=(10, 5, 1)))
-
-
 # import pdb; pdb.set_trace()
 model = Sequential()  # dropout=0.1, recurrent_dropout=0.1
-model.add(LSTM(240, activation='relu', return_sequences=True, input_shape=(62, 2)))  # LSTM GRU  return_state=True
-model.add(LSTM(120, activation='relu', return_sequences=True))  # activation='tanh', recurrent_activation='hard_sigmoid'
-model.add(LSTM(60, activation='relu'))
-model.add(Dense(60, activation='relu'))
+model.add(Dense(124, activation='relu', input_dim=124))
+model.add(Dense(248, activation='relu'))
+model.add(Dense(124, activation='relu'))
+model.add(Dense(62, activation='relu'))
+model.add(Dense(31, activation='relu'))
 model.add(Dense(1, activation='linear'))
 # sgd = optimizers.SGD(lr=0.1)  # , decay=1e-6, momentum=0.9, nesterov=True
 model.compile(loss='mse', optimizer='sgd', metrics=['acc'])  # adagrad adam sgd rmsprop
 # print(model.summary())
 
-for e in range(100):
-    print('Epoch: ' + str(e))
-    for d in feed_data:
-        model.fit(d['x'], d['y'], epochs=1, verbose=2)
+# import pdb; pdb.set_trace()
+# r = 1
+
+model.fit(x_array, y_array, verbose=2, epochs=100)
+# for epoch in range(10):
+#     # model.fit(x_array, y_array, verbose=2)
+#     for i in range(200):
+#         model.fit(x_array[i], y_array[i], verbose=2)
+
+# model.fit(x_array, y_array, verbose=2, epochs=1000)
+
+
+# for e in range(1):  # 100
+#     print('Epoch: ' + str(e))
+#     for d in feed_data:
+#         # model.fit(d['x'], d['y'][0], epochs=1, verbose=2)
+#         model.fit([[1], [2], [3], [4]], [5], epochs=1, verbose=2)
