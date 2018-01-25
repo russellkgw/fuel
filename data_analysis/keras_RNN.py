@@ -107,7 +107,22 @@ model.add(Dense(1, activation='linear'))
 model.compile(loss='mse', optimizer='sgd', metrics=['acc'])  # adagrad adam sgd rmsprop
 # print(model.summary())
 
-for e in range(100):
-    print('Epoch: ' + str(e))
-    for d in feed_data:
-        model.fit(d['x'], d['y'], epochs=1, verbose=2)
+
+x_test = []
+y_test = []
+for item in feed_data:
+    x_test.append(item['x'])
+    y_test.append(item['y'])
+
+
+print('x count: ' + str(len(x_test)))
+print('y count: ' + str(len(y_test)))
+
+
+# model.fit(np.array(x_test), np.array(y_test), epochs=1, verbose=2)
+model.fit(np.array([x_test]),np.array([y_test]),verbose=2)
+
+# for e in range(100):
+#     print('Epoch: ' + str(e))
+#     for d in feed_data:
+#         model.fit(d['x'], d['y'], epochs=1, verbose=2)

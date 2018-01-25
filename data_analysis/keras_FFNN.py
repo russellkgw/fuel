@@ -117,7 +117,16 @@ model.compile(loss='mse', optimizer='sgd', metrics=['acc'])  # adagrad adam sgd 
 # import pdb; pdb.set_trace()
 # r = 1
 
-model.fit(x_array, y_array, verbose=2, epochs=100)
+# y_array
+
+for _ in range(10):
+    for i in range(len(x_array)):
+        temp_x = np.array(x_array[i]).reshape(1, 124)
+        temp_y = np.array(y_array[i]).reshape(1, 1)
+        model.fit(temp_x, temp_y, verbose=1, epochs=1)
+
+
+# model.fit(np.array(x_array[0]).reshape(1, 124), np.array(y_array[0]).reshape(1, 1), verbose=2, epochs=1)
 # for epoch in range(10):
 #     # model.fit(x_array, y_array, verbose=2)
 #     for i in range(200):
