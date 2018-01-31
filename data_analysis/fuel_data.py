@@ -39,6 +39,8 @@ class FuelData(object):
         data = [e[3] for e in data]
         if percentage:
             data = self.percent_change_daily(data)
+        
+        # import pdb; pdb.set_trace()
         return data[offset:]  # last 62
 
     def exchange_rate_cycle_change(self, start_date, end_date):
