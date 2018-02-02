@@ -10,6 +10,14 @@ class DataConnector(object):
         self.con_string = '../db/development.sqlite3'
         self.current_date = date.today()
 
+    def fuel_date_range(self, fuel_date, num_months=3):
+        fuel_date = str(fuel_date)
+        split_date = fuel_date.split('-')
+        end_date = date(int(split_date[0]), int(split_date[1]), 27) - relativedelta(months=1)
+        start_date = end_date - relativedelta(months=num_months)
+        return {'start_date': str(start_date), 'end_date': str(end_date)}
+    
+    
     # Exchange rates
     def exchange_month_changes(self):
         fd = FuelData(self.con_string)
@@ -29,15 +37,11 @@ class DataConnector(object):
         return exchange_rate_changes
 
     def exchange_rates(self, fuel_date, percentage_change=False):
-        fuel_date = str(fuel_date)
-        fd = FuelData(self.con_string)
-        split_date = fuel_date.split('-')
-        end_date = date(int(split_date[0]), int(split_date[1]), 27) - relativedelta(months=1)
-        start_date = end_date - relativedelta(months=3)
-        data = fd.exchange_rates(str(start_date), str(end_date), percentage=percentage_change)
-        fd.close_db_connection()
-
+        date_range = self.fuel_date_range(fuel_date)
         
+        fd = FuelData(self.con_string)
+        data = fd.exchange_rates(date_range['start_date'], date_range['end_date'], percentage=percentage_change)
+        fd.close_db_connection()
 
         return data
 
@@ -60,6 +64,9 @@ class DataConnector(object):
         fd.close_db_connection()
         return exchange_future_changes
 
+    def exchange_futures(self, fuel_date, percentage_change=False):
+        pass
+
     # Oil prices
     def oil_month_changes(self):
         fd = FuelData(self.con_string)
@@ -79,12 +86,10 @@ class DataConnector(object):
         return oil_price_changes
 
     def oil_prices(self, fuel_date, percentage_change=False):
-        fuel_date = str(fuel_date)
+        date_range = self.fuel_date_range(fuel_date)
+
         fd = FuelData(self.con_string)
-        split_date = fuel_date.split('-')
-        end_date = date(int(split_date[0]), int(split_date[1]), 27) - relativedelta(months=1)
-        start_date = end_date - relativedelta(months=3)
-        data = fd.oil_prices(str(start_date), str(end_date), percentage=percentage_change)
+        data = fd.oil_prices(date_range['start_date'], date_range['end_date'], percentage=percentage_change)
         fd.close_db_connection()
         return data
     
@@ -110,6 +115,9 @@ class DataConnector(object):
 
         fd.close_db_connection()
         return oil_future_changes
+
+    def oil_futures(self, fuel_date, percentage_change=False):
+        pass
 
     # Fuel Prices
     def fuel_month_changes(self, step=1):
@@ -159,6 +167,8 @@ class DataConnector(object):
         data_map = []
         exr_min, exr_max = 1000.0, 0.0
         oil_min, oil_max = 1000.0, 0.0
+        exr_f_min, exr_f_max = 1000.0, 0.0
+        oil_f_min, oil_f_max = 1000.0, 0.0
         fp_min, fp_max = 1000.0, 0.0
 
         # Normilize the data
@@ -176,6 +186,20 @@ class DataConnector(object):
                     oil_min = o
                 if o > oil_max:
                     oil_max = o
+
+            # exr_f_data = self.exchange_futures(fp.date, percentage_change=percentage_change)
+            # for ef in exr_f_data:
+            #     if ef < exr_f_min:
+            #         exr_f_min = ef
+            #     if ef > exr_f_max:
+            #         exr_f_max = ef
+
+            # oil_f_data = self.oil_futures(fp.date, percentage_change=percentage_change)
+            # for of in oil_f_data:
+            #     if of < oil_f_min:
+            #         oil_f_min = of
+            #     if of > oil_f_max:
+            #         oil_f_max = of
 
             if fp.price < fp_min:
                     fp_min = fp.price

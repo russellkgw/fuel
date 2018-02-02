@@ -8,7 +8,7 @@ from data_connector import DataConnector
 
 
 data_conn = DataConnector()
-x_array, y_array = data_conn.fuel_prices_dates(percentage_change=True)
+x_array, y_array = data_conn.fuel_prices_dates(percentage_change=False)
 
 # import pdb; pdb.set_trace()
 
