@@ -8,11 +8,11 @@ from data_connector import DataConnector
 
 
 data_conn = DataConnector()
-x_array, y_array = data_conn.fuel_prices_dates(percentage_change=False)
+x_array, y_array = data_conn.fuel_prices_dates(start_date='2004-04-03', percentage_change=False)  # start_date='2004-04-03'    None is all
 
 # import pdb; pdb.set_trace()
 
-INPUT_DIM = 124
+INPUT_DIM = len(x_array[0])
 
 # import pdb; pdb.set_trace()
 model = Sequential()  # dropout=0.1, recurrent_dropout=0.1
@@ -30,12 +30,12 @@ print('size of x: ' + str(len(x_array)))
 
 # import pdb; pdb.set_trace()
 PRECISION = 6
+SPLIT = 140  # 240
 
-# y_array
 ### FIT ###
 print(' ### Fit the model ### ')
-x_fit = x_array[:240]
-y_fit = y_array[:240]
+x_fit = x_array[:SPLIT]
+y_fit = y_array[:SPLIT]
 EPOCHS = 10
 epoch_loss_list = []
 epoch_train_loss_avg = 0.0
@@ -59,8 +59,8 @@ print('AVERAGE TRAIN LOSS: ' + str(round(epoch_train_loss_avg, PRECISION)))
 
 ### EVALUATE ###
 print(' ### Evaluate the model ### ')
-x_test = x_array[240:]
-y_test = y_array[240:]
+x_test = x_array[SPLIT:]
+y_test = y_array[SPLIT:]
 epoch_fit_loss_avg = 0.0
 for i in range(len(x_test)):
     temp_x = np.array(x_test[i]).reshape(1, INPUT_DIM)
