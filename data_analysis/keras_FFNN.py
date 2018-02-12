@@ -8,7 +8,7 @@ from data_connector import DataConnector
 
 
 data_conn = DataConnector()
-x_array, y_array = data_conn.fuel_prices_dates(start_date='2004-04-03', percentage_change=False)  # start_date='2004-04-03'    None is all
+x_array, y_array = data_conn.fuel_prices_dates(start_date='2004-04-03', flatten=True, percentage_change=False)  # start_date='2004-04-03'    None is all
 
 # import pdb; pdb.set_trace()
 
@@ -42,8 +42,8 @@ epoch_train_loss_avg = 0.0
 for e in range(EPOCHS):
     epoch_loss = 0.0
     for i in range(len(x_fit)):
-        temp_x = np.array(x_fit[i]).reshape(1, INPUT_DIM)
-        temp_y = np.array(y_fit[i]).reshape(1, 1)
+        temp_x = x_fit[i].reshape(1, INPUT_DIM)
+        temp_y = y_fit[i].reshape(1, 1)
         res = model.fit(temp_x, temp_y, verbose=0, epochs=1)
         epoch_loss += res.history['loss'][0]
 
@@ -63,8 +63,8 @@ x_test = x_array[SPLIT:]
 y_test = y_array[SPLIT:]
 epoch_fit_loss_avg = 0.0
 for i in range(len(x_test)):
-    temp_x = np.array(x_test[i]).reshape(1, INPUT_DIM)
-    temp_y = np.array(y_test[i]).reshape(1, 1)
+    temp_x = x_test[i].reshape(1, INPUT_DIM)
+    temp_y = y_test[i].reshape(1, 1)
     res = model.evaluate(temp_x, temp_y, verbose=0)
     # print('EVAL: ' + str(i + 1) + ' LOSS: ' + str(res))
     epoch_fit_loss_avg += res / len(x_test)

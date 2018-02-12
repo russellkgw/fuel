@@ -148,7 +148,7 @@ class DataConnector(object):
         fd.close_db_connection()
         return fuel_price_changes
 
-    def fuel_prices_dates(self, percentage_change=False, normilize=True, start_date=None, end_date=None):
+    def fuel_prices_dates(self, percentage_change=False, normilize=True, start_date=None, end_date=None, flatten=True):
         # import pdb; pdb.set_trace()
         data = None
         if percentage_change:
@@ -160,7 +160,7 @@ class DataConnector(object):
             data = [DatePricePair(fp[3], fp[1]) for fp in fuel_prices]
 
         if normilize:
-            data = self.get_and_normilize_data(data, percentage_change=percentage_change)
+            data = self.get_and_normilize_data(data, flatten=flatten, percentage_change=percentage_change)
 
         x_array = []
         y_array = []
@@ -172,7 +172,7 @@ class DataConnector(object):
         return x_array, y_array
 
 
-    def get_and_normilize_data(self, data, percentage_change=False):
+    def get_and_normilize_data(self, data, flatten, percentage_change=False):
         data_map = []
         exr_min, exr_max = 1000.0, 0.0
         oil_min, oil_max = 1000.0, 0.0
@@ -231,20 +231,14 @@ class DataConnector(object):
             x3 = self.norm_array(d['exr_f'], exr_f_min, exr_f_max)
             x4 = self.norm_array(d['oil_f'], oil_f_min, oil_f_max)
 
-            x = np.append(x1, x2)  # .tolist()
-            x = np.append(x, x3)
-            x = np.append(x, x4)
-            x = x.tolist()
+            if flatten:
+                x = np.append(x1, x2)  # .tolist()
+                x = np.append(x, x3)
+                x = np.append(x, x4)
+            else:
+                x = np.column_stack((x1, x2, x3, x4))
 
-            x_new = []
-            for i in x:
-                x_new.append(i)
-
-            y_new = []
-            for i in y:
-                y_new.append(i)
-
-            feed_data.append({'date': d['date'], 'x': x_new, 'y': y_new})
+            feed_data.append({'date': d['date'], 'x': x, 'y': y})
         
         return feed_data
 
