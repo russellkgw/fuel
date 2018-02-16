@@ -1,6 +1,6 @@
 from keras.models import Sequential
 from keras.layers import LSTM, GRU
-from keras.layers import Dense
+from keras.layers import Dense, Dropout
 from keras import optimizers
 import numpy as np
 
@@ -13,14 +13,20 @@ x_array, y_array = data_conn.fuel_prices_dates(start_date='2004-04-03', flatten=
 # import pdb; pdb.set_trace()
 
 INPUT_DIM = len(x_array[0])
+DROP = 0.1
 
 # import pdb; pdb.set_trace()
 model = Sequential()  # dropout=0.1, recurrent_dropout=0.1
 model.add(Dense(124, activation='relu', input_dim=INPUT_DIM))
+# model.add(Dropout(DROP))
 model.add(Dense(248, activation='relu'))
+# model.add(Dropout(DROP))
 model.add(Dense(124, activation='relu'))
+# model.add(Dropout(DROP))
 model.add(Dense(62, activation='relu'))
+# model.add(Dropout(DROP))
 model.add(Dense(31, activation='relu'))
+# model.add(Dropout(DROP))
 model.add(Dense(1, activation='linear'))
 # sgd = optimizers.SGD(lr=0.1)  # , decay=1e-6, momentum=0.9, nesterov=True
 model.compile(loss='mse', optimizer='sgd')  # adagrad adam sgd rmsprop     , metrics=['acc']

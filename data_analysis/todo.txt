@@ -1,0 +1,69 @@
+Worked though the LSTM book, got something to work with reshaping
+
+Most time spent wrangling data
+
+Using the actual value instead of % change
+
+Struggled with large errors using actual value, but have implemented feature scaling
+(mean normalization)
+
+Using the future oil prices and exchange rates
+
+Spoke to a fund manager about oil vs gold, said that there is correlation
+but not sufficient to model
+
+used a 3 month sequence of data
+
+Built 3 models using Keras: FFNN, RNN, CNN
+
+FFNN:
+average train: 0.003
+average test: 0.002
+
+RNN:
+average train: 0.02
+average test: 0.002
+
+CNN:
+average train: 0.005
+average test: 0.04
+
+average train: 0.06
+average test: 0.007
+
+less pooling layers yielded better results
+
+
+norm, test set seperate
+
+upper bound of mean using actual vs % change
+
+
+questions for models ?
+
+how far back, 10 years ? 5 years ?
+
+data oil and excha vs all
+
+search sequence models where data is not complete oil future/oil
+
+what are people currently using?
+
+make basic linear regression.
+
+how deep, how many layers.
+
+epochs ?
+
+into ro fx rates, commodoties, derivatives
+
+1 intro
+2 lit review
+3 theory (rnn/ffnn/cnn)
+4 implementation (data models)
+5 results
+6 conclusion
+
+latec
+
+predicting bfp using deep neural networks.

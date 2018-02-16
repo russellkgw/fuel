@@ -76,8 +76,9 @@ epoch_fit_loss_avg = 0.0
 for i in range(len(x_test)):
     temp_x = x_test[i].reshape(1, SEQ_LEN, INPUT_DIM)
     temp_y = y_test[i].reshape(1, 1)
-    res = model.evaluate(temp_x, temp_y, verbose=0)
-    print('EVAL: ' + str(i + 1) + ' LOSS: ' + str(res))
+    res = model.evaluate(temp_x, temp_y, verbose=0)[0]
+    # import pdb; pdb.set_trace()
+    # print('EVAL: ' + str(i + 1) + ' LOSS: ' + str(res))
     epoch_fit_loss_avg += res / len(x_test)
 
 print('AVERAGE FIT LOSS: ' + str(round(epoch_fit_loss_avg, PRECISION)))

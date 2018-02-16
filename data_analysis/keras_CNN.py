@@ -16,27 +16,18 @@ INPUT_DIM = len(x_array[0][0])
 # import pdb; pdb.set_trace()
 
 
-# feed_data = []
-# for d in data:
-#     y = norm_array(d['y'], fp_min, fp_max)
-#     x1 = norm_array(d['exr'], exr_min, exr_max)
-#     x2 = norm_array(d['oil'], oil_min, oil_max)
-
-#     x = np.column_stack((x1, x2))
-#     x = x.reshape(1, 2, 62, 1)
-
-#     feed_data.append({'date': d['date'], 'x': x, 'y': y})
-
-
 model = Sequential()
 model.add(Conv2D(1, (2,2), activation='relu', padding='same', input_shape=(INPUT_DIM, SEQ_LEN, 1))) # ([width, height, channels])
 model.add(MaxPooling2D(pool_size=(2, 2)))
+model.add(Conv2D(1, (2,2), activation='relu', padding='same'))
+model.add(MaxPooling2D(pool_size=(2, 2)))
 model.add(Flatten())
+model.add(Dense(30, activation='relu'))
 model.add(Dense(10, activation='relu'))
 model.add(Dense(1))
 
 model.compile(loss='mse', optimizer='sgd', metrics=['acc'])
-# print(model.summary())
+print(model.summary())
 
 # import pdb; pdb.set_trace()
 PRECISION = 6
@@ -76,8 +67,9 @@ epoch_fit_loss_avg = 0.0
 for i in range(len(x_test)):
     temp_x = x_test[i].reshape(1, INPUT_DIM, SEQ_LEN, 1)
     temp_y = y_test[i].reshape(1, 1)
-    res = model.evaluate(temp_x, temp_y, verbose=0)
-    print('EVAL: ' + str(i + 1) + ' LOSS: ' + str(res))
-    # epoch_fit_loss_avg += res / len(x_test)
+    res = model.evaluate(temp_x, temp_y, verbose=0)[0]
+    # import pdb; pdb.set_trace()
+    # print('EVAL: ' + str(i + 1) + ' LOSS: ' + str(res))
+    epoch_fit_loss_avg += res / len(x_test)
 
 print('AVERAGE FIT LOSS: ' + str(round(epoch_fit_loss_avg, PRECISION)))
