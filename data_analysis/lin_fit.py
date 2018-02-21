@@ -1,10 +1,22 @@
 import numpy as np
+import statsmodels.api as sm
+import statsmodels.formula.api as smf
 
-x = np.array([0.0, 1.0, 2.0, 3.0,  4.0,  5.0])
-# x = np.array([[0.0, 0.1], [1.0, 1.1], [2.0, 2.1], [3.0, 3.1],  [4.0, 4.1],  [5.0, 51.]])
+from data_connector import DataConnector
+data_conn = DataConnector()
 
-y = np.array([0.0, 0.8, 0.9, 0.1, -0.8, -1.0])
+X = [1, 2, 3, 4, 5]
+X = sm.add_constant(X)  # Add intercept component
+y = [2, 4, 6, 8, 10]
 
-z = np.polyfit(x, y, 3)
+# Fit regression model
+# results = sm.OLS(y, X).fit()
 
-print(str(z))
+# Inspect the results
+# print(results.summary())
+
+x_array, y_array = data_conn.fuel_prices_dates(start_date='2004-04-03', flatten=False, percentage_change=False, normilize=False)  # start_date='2004-04-03'    None is all
+
+x_array = [np.average(x[:,0] * x[:,1]) for x in x_array]  # rand value of oil price
+
+# import pdb; pdb.set_trace()

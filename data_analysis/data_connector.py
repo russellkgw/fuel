@@ -148,7 +148,7 @@ class DataConnector(object):
         fd.close_db_connection()
         return fuel_price_changes
 
-    def fuel_prices_dates(self, percentage_change=False, normilize=True, start_date=None, end_date=None, flatten=True):
+    def fuel_prices_dates(self, percentage_change=False, normilize=True, start_date=None, end_date=None, flatten=True, lin=False):
         # import pdb; pdb.set_trace()
         data = None
         if percentage_change:
@@ -159,8 +159,7 @@ class DataConnector(object):
             fd.close_db_connection()
             data = [DatePricePair(fp[3], fp[1]) for fp in fuel_prices]
 
-        if normilize:
-            data = self.get_and_normilize_data(data, flatten=flatten, percentage_change=percentage_change)
+        data = self.get_data(data, flatten=flatten, percentage_change=percentage_change, normilize = normilize, lin = lin)
 
         x_array = []
         y_array = []
@@ -172,7 +171,7 @@ class DataConnector(object):
         return x_array, y_array
 
 
-    def get_and_normilize_data(self, data, flatten, percentage_change=False):
+    def get_data(self, data, flatten, percentage_change, normilize, lin):
         data_map = []
         exr_min, exr_max = 1000.0, 0.0
         oil_min, oil_max = 1000.0, 0.0
@@ -180,7 +179,6 @@ class DataConnector(object):
         oil_f_min, oil_f_max = 1000.0, 0.0
         fp_min, fp_max = 1000.0, 0.0
 
-        # Normilize the data
         for fp in data:
             exr_data = self.exchange_rates(fp.date, percentage_change=percentage_change)  # percentage=True
             for e in exr_data:
@@ -225,11 +223,11 @@ class DataConnector(object):
         
         feed_data = []
         for d in data_map:
-            y = self.norm_array(d['y'], fp_min, fp_max)
-            x1 = self.norm_array(d['exr'], exr_min, exr_max)
-            x2 = self.norm_array(d['oil'], oil_min, oil_max)
-            x3 = self.norm_array(d['exr_f'], exr_f_min, exr_f_max)
-            x4 = self.norm_array(d['oil_f'], oil_f_min, oil_f_max)
+            y = self.norm_array(d['y'], fp_min, fp_max) if normilize else d['y']
+            x1 = self.norm_array(d['exr'], exr_min, exr_max) if normilize else d['exr']
+            x2 = self.norm_array(d['oil'], oil_min, oil_max) if normilize else d['oil']
+            x3 = self.norm_array(d['exr_f'], exr_f_min, exr_f_max) if normilize else d['exr_f']
+            x4 = self.norm_array(d['oil_f'], oil_f_min, oil_f_max) if normilize else d['oil_f']
 
             if flatten:
                 x = np.append(x1, x2)  # .tolist()
