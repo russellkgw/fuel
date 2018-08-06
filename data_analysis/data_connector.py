@@ -36,11 +36,11 @@ class DataConnector(object):
         fd.close_db_connection()
         return exchange_rate_changes
 
-    def exchange_rates(self, fuel_date, percentage_change=False):
+    def exchange_rates(self, fuel_date, percentage_change=False, seq_length=60):
         date_range = self.fuel_date_range(fuel_date)
         
         fd = FuelData(self.con_string)
-        data = fd.exchange_rates(date_range['start_date'], date_range['end_date'], percentage=percentage_change)
+        data = fd.exchange_rates(date_range['start_date'], date_range['end_date'], percentage=percentage_change, offset=seq_length)
         fd.close_db_connection()
 
         return data
@@ -64,11 +64,11 @@ class DataConnector(object):
     #     fd.close_db_connection()
     #     return exchange_future_changes
 
-    def exchange_futures(self, fuel_date, percentage_change=False):
+    def exchange_futures(self, fuel_date, percentage_change=False, seq_length=60):
         date_range = self.fuel_date_range(fuel_date)
         
         fd = FuelData(self.con_string)
-        data = fd.exchange_future(date_range['start_date'], date_range['end_date'], percentage=percentage_change)
+        data = fd.exchange_future(date_range['start_date'], date_range['end_date'], percentage=percentage_change, offset=seq_length)
         fd.close_db_connection()
 
         return data
@@ -91,11 +91,11 @@ class DataConnector(object):
     #     fd.close_db_connection()
     #     return oil_price_changes
 
-    def oil_prices(self, fuel_date, percentage_change=False):
+    def oil_prices(self, fuel_date, percentage_change=False, seq_length=60):
         date_range = self.fuel_date_range(fuel_date)
 
         fd = FuelData(self.con_string)
-        data = fd.oil_prices(date_range['start_date'], date_range['end_date'], percentage=percentage_change)
+        data = fd.oil_prices(date_range['start_date'], date_range['end_date'], percentage=percentage_change, offset=seq_length)
         fd.close_db_connection()
         return data
     
@@ -121,11 +121,11 @@ class DataConnector(object):
     #     fd.close_db_connection()
     #     return oil_future_changes
 
-    def oil_futures(self, fuel_date, percentage_change=False):
+    def oil_futures(self, fuel_date, percentage_change=False, seq_length=60):
         date_range = self.fuel_date_range(fuel_date)
 
         fd = FuelData(self.con_string)
-        data = fd.oil_future(date_range['start_date'], date_range['end_date'], percentage=percentage_change)
+        data = fd.oil_future(date_range['start_date'], date_range['end_date'], percentage=percentage_change, offset=seq_length)
         fd.close_db_connection()
         return data
 
@@ -148,18 +148,18 @@ class DataConnector(object):
         fd.close_db_connection()
         return fuel_price_changes
 
-    def fuel_prices_dates(self, percentage_change=False, normilize=True, start_date=None, end_date=None, flatten=True, lin=False):
+    def fuel_prices_dates(self, percentage_change=False, normilize=True, start_date=None, end_date=None, flatten=True, lin=False, data_set='training', seq_length=60):
         # import pdb; pdb.set_trace()
         data = None
         if percentage_change:
             data = self.fuel_month_changes()
         else:
             fd = FuelData(self.con_string)
-            fuel_prices = fd.fuel_prices(start_date)
+            fuel_prices = fd.fuel_prices(start_date, data_set)
             fd.close_db_connection()
             data = [DatePricePair(fp[3], fp[1]) for fp in fuel_prices]
 
-        data = self.get_data(data, flatten=flatten, percentage_change=percentage_change, normilize = normilize, lin = lin)
+        data = self.get_data(data, flatten=flatten, percentage_change=percentage_change, normilize=normilize, lin=lin, seq_length=seq_length)
 
         x_array = []
         y_array = []
@@ -167,11 +167,11 @@ class DataConnector(object):
         for item in data:
             x_array.append(item['x'])
             y_array.append(item['y'][0])
-        
+
         return x_array, y_array
 
 
-    def get_data(self, data, flatten, percentage_change, normilize, lin):
+    def get_data(self, data, flatten, percentage_change, normilize, lin, seq_length):
         data_map = []
         exr_min, exr_max = 1000.0, 0.0
         oil_min, oil_max = 1000.0, 0.0
@@ -180,28 +180,28 @@ class DataConnector(object):
         fp_min, fp_max = 1000.0, 0.0
 
         for fp in data:
-            exr_data = self.exchange_rates(fp.date, percentage_change=percentage_change)  # percentage=True
+            exr_data = self.exchange_rates(fp.date, percentage_change=percentage_change, seq_length=seq_length)  # percentage=True
             for e in exr_data:
                 if e < exr_min:
                     exr_min = e
                 if e > exr_max:
                     exr_max = e
 
-            oil_data = self.oil_prices(fp.date, percentage_change=percentage_change)  # percentage=True
+            oil_data = self.oil_prices(fp.date, percentage_change=percentage_change, seq_length=seq_length)  # percentage=True
             for o in oil_data:
                 if o < oil_min:
                     oil_min = o
                 if o > oil_max:
                     oil_max = o
 
-            exr_f_data = self.exchange_futures(fp.date, percentage_change=percentage_change)
+            exr_f_data = self.exchange_futures(fp.date, percentage_change=percentage_change, seq_length=seq_length)
             for ef in exr_f_data:
                 if ef < exr_f_min:
                     exr_f_min = ef
                 if ef > exr_f_max:
                     exr_f_max = ef
 
-            oil_f_data = self.oil_futures(fp.date, percentage_change=percentage_change)
+            oil_f_data = self.oil_futures(fp.date, percentage_change=percentage_change, seq_length=seq_length)
             for of in oil_f_data:
                 if of < oil_f_min:
                     oil_f_min = of

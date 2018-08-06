@@ -6,13 +6,16 @@ import numpy as np
 
 from data_connector import DataConnector
 
+SEQ_LENGTH = 40  # 20 40 60
 
 data_conn = DataConnector()
-x_array, y_array = data_conn.fuel_prices_dates(start_date='2004-04-03', flatten=True, percentage_change=False)  # start_date='2004-04-03'    None is all
+x_train_array, y_train_array = data_conn.fuel_prices_dates(start_date='2004-04-03', flatten=True, percentage_change=False, data_set='training', seq_length=SEQ_LENGTH)  # start_date='2004-04-03'    None is all
+x_test_array, y_test_array = data_conn.fuel_prices_dates(start_date='2004-04-03', flatten=True, percentage_change=False, data_set='testing', seq_length=SEQ_LENGTH)  # start_date='2004-04-03'    None is all
+x_validate_array, y_validate_array = data_conn.fuel_prices_dates(start_date='2004-04-03', flatten=True, percentage_change=False, data_set='validation', seq_length=SEQ_LENGTH)  # start_date='2004-04-03'    None is all
 
 # import pdb; pdb.set_trace()
 
-INPUT_DIM = len(x_array[0])
+INPUT_DIM = len(x_train_array[0])
 DROP = 0.1
 
 # import pdb; pdb.set_trace()
@@ -32,16 +35,16 @@ model.add(Dense(1, activation='linear'))
 model.compile(loss='mse', optimizer='sgd')  # adagrad adam sgd rmsprop     , metrics=['acc']
 # print(model.summary())
 
-print('size of x: ' + str(len(x_array)))
+# print('size of x: ' + str(len(x_array)))
 
 # import pdb; pdb.set_trace()
 PRECISION = 6
-SPLIT = 140  # 240
+# SPLIT = 140  # 240
 
 ### FIT ###
 print(' ### Fit the model ### ')
-x_fit = x_array[:SPLIT]
-y_fit = y_array[:SPLIT]
+x_fit = x_train_array # x_array #[:SPLIT]
+y_fit = y_train_array # y_array #[:SPLIT]
 EPOCHS = 10
 epoch_loss_list = []
 epoch_train_loss_avg = 0.0
@@ -64,9 +67,10 @@ print('AVERAGE TRAIN LOSS: ' + str(round(epoch_train_loss_avg, PRECISION)))
 
 
 ### EVALUATE ###
+
 print(' ### Evaluate the model ### ')
-x_test = x_array[SPLIT:]
-y_test = y_array[SPLIT:]
+x_test = x_test_array
+y_test = y_test_array
 epoch_fit_loss_avg = 0.0
 for i in range(len(x_test)):
     temp_x = x_test[i].reshape(1, INPUT_DIM)

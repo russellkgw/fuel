@@ -33,24 +33,26 @@ class FuelData(object):
     # Exchange rates
 
     # use 28th
-    def exchange_rates(self, start_date, end_date, offset=-62, percentage=False):
+    def exchange_rates(self, start_date, end_date, offset=62, percentage=False):
+        offset = offset * -1
         data = self.db_con.execute("SELECT * FROM exchange_rates WHERE CAST(STRFTIME('%w', date) AS INTEGER) IN (1, 2, 3, 4, 5) AND date > '{0}' AND date <= '{1}' ORDER BY date;".format(start_date, end_date)).fetchall()
         data = [e[3] for e in data]
         if percentage:
             data = self.percent_change_daily(data)
-        
+
         return data[offset:]  # last 62
 
-    def exchange_rate_cycle_change(self, start_date, end_date):
-        rates = self.db_con.execute("SELECT date, rate FROM exchange_rates WHERE CAST(STRFTIME('%w', date) AS INTEGER) IN (1, 2, 3, 4, 5) AND date >= '" + str(start_date) + "' AND date <= '" + str(end_date) + "' ORDER BY date;").fetchall()
-        return self.percent_change(rates)
+    # def exchange_rate_cycle_change(self, start_date, end_date):
+    #     rates = self.db_con.execute("SELECT date, rate FROM exchange_rates WHERE CAST(STRFTIME('%w', date) AS INTEGER) IN (1, 2, 3, 4, 5) AND date >= '" + str(start_date) + "' AND date <= '" + str(end_date) + "' ORDER BY date;").fetchall()
+    #     return self.percent_change(rates)
 
-    def exchange_rate_cycle_average(self, start_date, end_date):
-        return self.db_con.execute("SELECT AVG(rate) FROM exchange_rates WHERE CAST(STRFTIME('%w', date) AS INTEGER) IN (1, 2, 3, 4, 5) AND date >= '" + str(start_date) + "' AND date <= '" + str(end_date) + "';").fetchone()[0]
+    # def exchange_rate_cycle_average(self, start_date, end_date):
+    #     return self.db_con.execute("SELECT AVG(rate) FROM exchange_rates WHERE CAST(STRFTIME('%w', date) AS INTEGER) IN (1, 2, 3, 4, 5) AND date >= '" + str(start_date) + "' AND date <= '" + str(end_date) + "';").fetchone()[0]
 
     # Exchange rate futures
 
-    def exchange_future(self, start_date, end_date, offset=-62, percentage=False):
+    def exchange_future(self, start_date, end_date, offset=62, percentage=False):
+        offset = offset * -1
         data = self.db_con.execute("SELECT date, IFNULL(settle, 0.0) AS settle FROM exchange_futures WHERE CAST(STRFTIME('%w', date) AS INTEGER) IN (1, 2, 3, 4, 5) AND date > '" + str(start_date) + "' AND date <= '" + str(end_date) + "' ORDER BY date;").fetchall()
         
         data = [e[1] for e in data]
@@ -61,9 +63,13 @@ class FuelData(object):
 
     # Oil prices
 
-    def oil_prices(self, start_date, end_date, offset=-62, percentage=False):
+    def oil_prices(self, start_date, end_date, offset=62, percentage=False):
+        offset = offset * -1
         data = self.db_con.execute("SELECT * FROM oil_prices WHERE CAST(STRFTIME('%w', date) AS INTEGER) IN (1, 2, 3, 4, 5) AND date > '{0}' AND date <= '{1}' ORDER BY date;".format(start_date, end_date)).fetchall()
         data = [o[2] for o in data]
+
+        # import pdb; pdb.set_trace()
+
         if percentage:
             data = self.percent_change_daily(data)
         return data[offset:]
@@ -81,9 +87,10 @@ class FuelData(object):
     #     rates = self.db_con.execute("SELECT date, settle FROM oil_futures WHERE CAST(STRFTIME('%w', date) AS INTEGER) IN (1, 2, 3, 4, 5) AND date >= '" + str(start_date) + "' AND date <= '" + str(end_date) + "' ORDER BY date;").fetchall()
     #     return self.percent_change(rates)
 
-    def oil_future(self, start_date, end_date, offset=-62, percentage=False):
+    def oil_future(self, start_date, end_date, offset=62, percentage=False):
+        offset = offset * -1
         data = self.db_con.execute("SELECT date, IFNULL(settle, 0.0) AS settle FROM oil_futures WHERE CAST(STRFTIME('%w', date) AS INTEGER) IN (1, 2, 3, 4, 5) AND date >= '" + str(start_date) + "' AND date <= '" + str(end_date) + "' ORDER BY date;").fetchall()
-        
+
         data = [e[1] for e in data]
         if percentage:
             data = self.percent_change_daily(data)
@@ -92,11 +99,21 @@ class FuelData(object):
 
     # Fuel Prices
 
-    def fuel_prices(self, start_date=None):
-        if start_date:
-            return self.db_con.execute("SELECT * FROM fuel_prices WHERE date >= '{0}' ORDER BY date;".format(start_date)).fetchall()
-        else:
-            return self.db_con.execute("SELECT * FROM fuel_prices ORDER BY date;").fetchall()
+    def fuel_prices(self, start_date=None, data_set='training'):
+        select_set = 'fuel_price_' + data_set
+        return self.db_con.execute("SELECT * FROM " + select_set + " ORDER BY date;").fetchall()
+
+        # if start_date:
+            # return self.db_con.execute("SELECT * FROM fuel_prices WHERE date >= '{0}' ORDER BY date;".format(start_date)).fetchall()
+        #     return self.db_con.execute("SELECT * FROM fuel_price_training ORDER BY date;").fetchall()
+        # else:
+        #     return self.db_con.execute("SELECT * FROM fuel_prices ORDER BY date;").fetchall()
+
+    # def fuel_prices_testing(self):
+    #     return self.db_con.execute("SELECT * FROM fuel_prices_testing ORDER BY date;").fetchall()
+
+    # def fuel_prices_validate(self):
+    #     return self.db_con.execute("SELECT * FROM fuel_price_validation ORDER BY date;").fetchall()
 
     # def fuel_price_cycle_change(self, start_date, end_date):
     #     prices = self.db_con.execute("SELECT date, basic_fuel_price FROM fuel_prices WHERE date = '" + str(start_date) + "' OR date = '" + str(end_date) + "' ORDER BY date;").fetchall()
