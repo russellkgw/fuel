@@ -1,6 +1,7 @@
 from fuel_data import FuelData
 from datetime import date
 from dateutil.relativedelta import relativedelta
+from dateutil.parser import parse
 import numpy as np
 
 
@@ -11,13 +12,19 @@ class DataConnector(object):
         self.current_date = date.today()
 
     def fuel_date_range(self, fuel_date, num_months=3):
-        fuel_date = str(fuel_date)
-        split_date = fuel_date.split('-')
-        end_date = date(int(split_date[0]), int(split_date[1]), 27) - relativedelta(months=1)
+        # fuel_date = str(fuel_date)
+        # split_date = fuel_date.split('-')
+
+        # import pdb; pdb.set_trace()
+
+        end_date = parse(fuel_date)  # date(int(split_date[0]), int(split_date[1]), 27) - relativedelta(months=1)
         start_date = end_date - relativedelta(months=num_months)
-        return {'start_date': str(start_date), 'end_date': str(end_date)}
-    
-    
+
+        # import pdb; pdb.set_trace()
+
+        return {'start_date': str(start_date).split(' ')[0], 'end_date': str(end_date).split(' ')[0]}
+
+
     # Exchange rates
     def exchange_month_changes(self):
         fd = FuelData(self.con_string)
@@ -36,11 +43,11 @@ class DataConnector(object):
         fd.close_db_connection()
         return exchange_rate_changes
 
-    def exchange_rates(self, fuel_date, percentage_change=False, seq_length=60):
+    def exchange_rates(self, fuel_date, percentage_change=False, seq_length=60, pre_set=0, pre_set_val=0.0):
         date_range = self.fuel_date_range(fuel_date)
         
         fd = FuelData(self.con_string)
-        data = fd.exchange_rates(date_range['start_date'], date_range['end_date'], percentage=percentage_change, offset=seq_length)
+        data = fd.exchange_rates(date_range['start_date'], date_range['end_date'], percentage=percentage_change, offset=seq_length, pre_set=pre_set, pre_set_val=pre_set_val)
         fd.close_db_connection()
 
         return data
@@ -64,11 +71,11 @@ class DataConnector(object):
     #     fd.close_db_connection()
     #     return exchange_future_changes
 
-    def exchange_futures(self, fuel_date, percentage_change=False, seq_length=60):
+    def exchange_futures(self, fuel_date, percentage_change=False, seq_length=60, pre_set=0, pre_set_val=0.0):
         date_range = self.fuel_date_range(fuel_date)
         
         fd = FuelData(self.con_string)
-        data = fd.exchange_future(date_range['start_date'], date_range['end_date'], percentage=percentage_change, offset=seq_length)
+        data = fd.exchange_future(date_range['start_date'], date_range['end_date'], percentage=percentage_change, offset=seq_length, pre_set=pre_set, pre_set_val=pre_set_val)
         fd.close_db_connection()
 
         return data
@@ -91,11 +98,11 @@ class DataConnector(object):
     #     fd.close_db_connection()
     #     return oil_price_changes
 
-    def oil_prices(self, fuel_date, percentage_change=False, seq_length=60):
+    def oil_prices(self, fuel_date, percentage_change=False, seq_length=60, pre_set=0, pre_set_val=0.0):
         date_range = self.fuel_date_range(fuel_date)
 
         fd = FuelData(self.con_string)
-        data = fd.oil_prices(date_range['start_date'], date_range['end_date'], percentage=percentage_change, offset=seq_length)
+        data = fd.oil_prices(date_range['start_date'], date_range['end_date'], percentage=percentage_change, offset=seq_length, pre_set=pre_set, pre_set_val=pre_set_val)
         fd.close_db_connection()
         return data
     
@@ -121,34 +128,34 @@ class DataConnector(object):
     #     fd.close_db_connection()
     #     return oil_future_changes
 
-    def oil_futures(self, fuel_date, percentage_change=False, seq_length=60):
+    def oil_futures(self, fuel_date, percentage_change=False, seq_length=60, pre_set=0, pre_set_val=0.0):
         date_range = self.fuel_date_range(fuel_date)
 
         fd = FuelData(self.con_string)
-        data = fd.oil_future(date_range['start_date'], date_range['end_date'], percentage=percentage_change, offset=seq_length)
+        data = fd.oil_future(date_range['start_date'], date_range['end_date'], percentage=percentage_change, offset=seq_length, pre_set=pre_set, pre_set_val=pre_set_val)
         fd.close_db_connection()
         return data
 
     # Fuel Prices
-    def fuel_month_changes(self, step=1):
-        fd = FuelData(self.con_string)
-        start_date = date(1995, 12, 3)  # 2004, 1, 1
-        end_date = date(1996, 1, 3)  # 2004, 2, 1
+    # def fuel_month_changes(self, step=1):
+    #     fd = FuelData(self.con_string)
+    #     start_date = date(1995, 12, 3)  # 2004, 1, 1
+    #     end_date = date(1996, 1, 3)  # 2004, 2, 1
 
-        fuel_price_changes = []
+    #     fuel_price_changes = []
 
-        stop_date = date(2017, 8, 3)
+    #     stop_date = date(2017, 8, 3)
 
-        while start_date <= stop_date:
-            dpp = DatePricePair(end_date, fd.fuel_price_cycle_change(start_date, end_date))
-            fuel_price_changes.append(dpp)
-            start_date = start_date + relativedelta(months=1)
-            end_date = end_date + relativedelta(months=1)
+    #     while start_date <= stop_date:
+    #         dpp = DatePricePair(end_date, fd.fuel_price_cycle_change(start_date, end_date))
+    #         fuel_price_changes.append(dpp)
+    #         start_date = start_date + relativedelta(months=1)
+    #         end_date = end_date + relativedelta(months=1)
 
-        fd.close_db_connection()
-        return fuel_price_changes
+    #     fd.close_db_connection()
+    #     return fuel_price_changes
 
-    def fuel_prices_dates(self, percentage_change=False, normilize=True, start_date=None, end_date=None, flatten=True, lin=False, data_set='training', seq_length=60):
+    def fuel_prices_dates(self, percentage_change=False, normilize=True, start_date=None, end_date=None, flatten=True, lin=False, data_set='training', seq_length=60, pre_set=0, pre_set_val=0.0):
         # import pdb; pdb.set_trace()
         data = None
         if percentage_change:
@@ -159,7 +166,7 @@ class DataConnector(object):
             fd.close_db_connection()
             data = [DatePricePair(fp[3], fp[1]) for fp in fuel_prices]
 
-        data = self.get_data(data, flatten=flatten, percentage_change=percentage_change, normilize=normilize, lin=lin, seq_length=seq_length)
+        data = self.get_data(data, flatten=flatten, percentage_change=percentage_change, normilize=normilize, lin=lin, seq_length=seq_length, pre_set=pre_set, pre_set_val=pre_set_val)
 
         x_array = []
         y_array = []
@@ -171,7 +178,7 @@ class DataConnector(object):
         return x_array, y_array
 
 
-    def get_data(self, data, flatten, percentage_change, normilize, lin, seq_length):
+    def get_data(self, data, flatten, percentage_change, normilize, lin, seq_length, pre_set, pre_set_val):
         data_map = []
         exr_min, exr_max = 1000.0, 0.0
         oil_min, oil_max = 1000.0, 0.0
@@ -180,28 +187,28 @@ class DataConnector(object):
         fp_min, fp_max = 1000.0, 0.0
 
         for fp in data:
-            exr_data = self.exchange_rates(fp.date, percentage_change=percentage_change, seq_length=seq_length)  # percentage=True
+            exr_data = self.exchange_rates(fp.date, percentage_change=percentage_change, seq_length=seq_length, pre_set=pre_set, pre_set_val=pre_set_val)  # percentage=True
             for e in exr_data:
                 if e < exr_min:
                     exr_min = e
                 if e > exr_max:
                     exr_max = e
 
-            oil_data = self.oil_prices(fp.date, percentage_change=percentage_change, seq_length=seq_length)  # percentage=True
+            oil_data = self.oil_prices(fp.date, percentage_change=percentage_change, seq_length=seq_length, pre_set=pre_set, pre_set_val=pre_set_val)  # percentage=True
             for o in oil_data:
                 if o < oil_min:
                     oil_min = o
                 if o > oil_max:
                     oil_max = o
 
-            exr_f_data = self.exchange_futures(fp.date, percentage_change=percentage_change, seq_length=seq_length)
+            exr_f_data = self.exchange_futures(fp.date, percentage_change=percentage_change, seq_length=seq_length, pre_set=pre_set, pre_set_val=pre_set_val)
             for ef in exr_f_data:
                 if ef < exr_f_min:
                     exr_f_min = ef
                 if ef > exr_f_max:
                     exr_f_max = ef
 
-            oil_f_data = self.oil_futures(fp.date, percentage_change=percentage_change, seq_length=seq_length)
+            oil_f_data = self.oil_futures(fp.date, percentage_change=percentage_change, seq_length=seq_length, pre_set=pre_set, pre_set_val=pre_set_val)
             for of in oil_f_data:
                 if of < oil_f_min:
                     oil_f_min = of

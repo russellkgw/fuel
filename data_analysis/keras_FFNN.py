@@ -6,12 +6,14 @@ import numpy as np
 
 from data_connector import DataConnector
 
-SEQ_LENGTH = 40  # 20 40 60
+SEQ_LENGTH = 60  # 20 40 60
+PRE_SET = 5
+PRE_SET_VAL = 0.0
 
 data_conn = DataConnector()
-x_train_array, y_train_array = data_conn.fuel_prices_dates(start_date='2004-04-03', flatten=True, percentage_change=False, data_set='training', seq_length=SEQ_LENGTH)  # start_date='2004-04-03'    None is all
-x_test_array, y_test_array = data_conn.fuel_prices_dates(start_date='2004-04-03', flatten=True, percentage_change=False, data_set='testing', seq_length=SEQ_LENGTH)  # start_date='2004-04-03'    None is all
-x_validate_array, y_validate_array = data_conn.fuel_prices_dates(start_date='2004-04-03', flatten=True, percentage_change=False, data_set='validation', seq_length=SEQ_LENGTH)  # start_date='2004-04-03'    None is all
+x_train_array, y_train_array = data_conn.fuel_prices_dates(start_date='2004-04-03', data_set='training', seq_length=SEQ_LENGTH, pre_set=PRE_SET, pre_set_val=PRE_SET_VAL)  # start_date='2004-04-03'    None is all
+x_test_array, y_test_array = data_conn.fuel_prices_dates(start_date='2004-04-03', data_set='testing', seq_length=SEQ_LENGTH, pre_set=PRE_SET, pre_set_val=PRE_SET_VAL)  # start_date='2004-04-03'    None is all
+x_validate_array, y_validate_array = data_conn.fuel_prices_dates(start_date='2004-04-03', data_set='validation', seq_length=SEQ_LENGTH, pre_set=PRE_SET, pre_set_val=PRE_SET_VAL)  # start_date='2004-04-03'    None is all
 
 # import pdb; pdb.set_trace()
 
@@ -68,15 +70,15 @@ print('AVERAGE TRAIN LOSS: ' + str(round(epoch_train_loss_avg, PRECISION)))
 
 ### EVALUATE ###
 
-print(' ### Evaluate the model ### ')
-x_test = x_test_array
-y_test = y_test_array
-epoch_fit_loss_avg = 0.0
-for i in range(len(x_test)):
-    temp_x = x_test[i].reshape(1, INPUT_DIM)
-    temp_y = y_test[i].reshape(1, 1)
-    res = model.evaluate(temp_x, temp_y, verbose=0)
-    # print('EVAL: ' + str(i + 1) + ' LOSS: ' + str(res))
-    epoch_fit_loss_avg += res / len(x_test)
+# print(' ### Evaluate the model ### ')
+# x_test = x_test_array
+# y_test = y_test_array
+# epoch_fit_loss_avg = 0.0
+# for i in range(len(x_test)):
+#     temp_x = x_test[i].reshape(1, INPUT_DIM)
+#     temp_y = y_test[i].reshape(1, 1)
+#     res = model.evaluate(temp_x, temp_y, verbose=0)
+#     # print('EVAL: ' + str(i + 1) + ' LOSS: ' + str(res))
+#     epoch_fit_loss_avg += res / len(x_test)
 
-print('AVERAGE FIT LOSS: ' + str(round(epoch_fit_loss_avg, PRECISION)))
+# print('AVERAGE FIT LOSS: ' + str(round(epoch_fit_loss_avg, PRECISION)))
