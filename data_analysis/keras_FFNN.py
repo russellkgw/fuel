@@ -3,11 +3,13 @@ from keras.layers import LSTM, GRU
 from keras.layers import Dense, Dropout
 from keras import optimizers
 import numpy as np
+import matplotlib
+import matplotlib.pyplot as plt
 
 from data_connector import DataConnector
 
 SEQ_LENGTH = 60  # 20 40 60
-PRE_SET = 5
+PRE_SET = 0
 PRE_SET_VAL = 0.0
 
 data_conn = DataConnector()
@@ -70,15 +72,33 @@ print('AVERAGE TRAIN LOSS: ' + str(round(epoch_train_loss_avg, PRECISION)))
 
 ### EVALUATE ###
 
-# print(' ### Evaluate the model ### ')
-# x_test = x_test_array
-# y_test = y_test_array
-# epoch_fit_loss_avg = 0.0
-# for i in range(len(x_test)):
-#     temp_x = x_test[i].reshape(1, INPUT_DIM)
-#     temp_y = y_test[i].reshape(1, 1)
-#     res = model.evaluate(temp_x, temp_y, verbose=0)
-#     # print('EVAL: ' + str(i + 1) + ' LOSS: ' + str(res))
-#     epoch_fit_loss_avg += res / len(x_test)
+print(' ### Evaluate the model ### ')
+x_test = x_test_array
+y_test = y_test_array
+epoch_fit_loss_avg = 0.0
+for i in range(len(x_test)):
+    temp_x = x_test[i].reshape(1, INPUT_DIM)
+    temp_y = y_test[i].reshape(1, 1)
+    res = model.evaluate(temp_x, temp_y, verbose=0)
+    # print('EVAL: ' + str(i + 1) + ' LOSS: ' + str(res))
+    epoch_fit_loss_avg += res / len(x_test)
 
-# print('AVERAGE FIT LOSS: ' + str(round(epoch_fit_loss_avg, PRECISION)))
+print('AVERAGE FIT LOSS: ' + str(round(epoch_fit_loss_avg, PRECISION)))
+
+
+
+
+###  Plot  ### 
+
+# Data for plotting
+t = [1,2,3,4,5]
+s = [0.1,0.2,0.3,0.4,0.5]
+
+fig, ax = plt.subplots()
+ax.plot(t, s)
+
+ax.set(xlabel='time (s)', ylabel='voltage (mV)',
+       title='About as simple as it gets, folks')
+ax.grid()
+
+plt.show()

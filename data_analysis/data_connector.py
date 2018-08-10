@@ -45,6 +45,9 @@ class DataConnector(object):
 
     def exchange_rates(self, fuel_date, percentage_change=False, seq_length=60, pre_set=0, pre_set_val=0.0):
         date_range = self.fuel_date_range(fuel_date)
+
+        # import pdb; pdb.set_trace()
+        # r = 1
         
         fd = FuelData(self.con_string)
         data = fd.exchange_rates(date_range['start_date'], date_range['end_date'], percentage=percentage_change, offset=seq_length, pre_set=pre_set, pre_set_val=pre_set_val)
@@ -162,10 +165,13 @@ class DataConnector(object):
             data = self.fuel_month_changes()
         else:
             fd = FuelData(self.con_string)
-            fuel_prices = fd.fuel_prices(start_date, data_set)
+            fuel_prices = fd.fuel_prices(start_date, data_set=data_set)
             fd.close_db_connection()
             data = [DatePricePair(fp[3], fp[1]) for fp in fuel_prices]
 
+        # import pdb; pdb.set_trace()
+        # r = 1
+        
         data = self.get_data(data, flatten=flatten, percentage_change=percentage_change, normilize=normilize, lin=lin, seq_length=seq_length, pre_set=pre_set, pre_set_val=pre_set_val)
 
         x_array = []
@@ -185,6 +191,9 @@ class DataConnector(object):
         exr_f_min, exr_f_max = 1000.0, 0.0
         oil_f_min, oil_f_max = 1000.0, 0.0
         fp_min, fp_max = 1000.0, 0.0
+
+        # import pdb; pdb.set_trace()
+        # r = 1
 
         for fp in data:
             exr_data = self.exchange_rates(fp.date, percentage_change=percentage_change, seq_length=seq_length, pre_set=pre_set, pre_set_val=pre_set_val)  # percentage=True
@@ -222,11 +231,11 @@ class DataConnector(object):
 
             data_map.append({'date': fp.date, 'y': [fp.price], 'exr': exr_data, 'oil': oil_data, 'exr_f': exr_f_data, 'oil_f': oil_f_data})
 
-        print('fp min: ' + str(fp_min)), print('fp max: ' + str(fp_max))
-        print('ex min: ' + str(exr_min)), print('ex max: ' + str(exr_max))
-        print('o min: ' + str(oil_min)), print('o max: ' + str(oil_max))
-        print('ef min: ' + str(exr_f_min)), print('ef max: ' + str(exr_f_max))
-        print('of min: ' + str(oil_f_min)), print('of max: ' + str(oil_f_max))
+        # print('fp min: ' + str(fp_min)), print('fp max: ' + str(fp_max))
+        # print('ex min: ' + str(exr_min)), print('ex max: ' + str(exr_max))
+        # print('o min: ' + str(oil_min)), print('o max: ' + str(oil_max))
+        # print('ef min: ' + str(exr_f_min)), print('ef max: ' + str(exr_f_max))
+        # print('of min: ' + str(oil_f_min)), print('of max: ' + str(oil_f_max))
         
         feed_data = []
         for d in data_map:
@@ -244,7 +253,7 @@ class DataConnector(object):
                 x = np.column_stack((x1, x2, x3, x4))
 
             feed_data.append({'date': d['date'], 'x': x, 'y': y})
-        
+
         return feed_data
 
     def norm_array(self, input, min, max):

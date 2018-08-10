@@ -48,6 +48,8 @@ class FuelData(object):
             pre_set = pre_set * -1
             data = data[:pre_set] + pre_set_array
 
+        # import pdb; pdb.set_trace()
+        # r = 1
         return data
 
     # def exchange_rate_cycle_change(self, start_date, end_date):
@@ -74,6 +76,8 @@ class FuelData(object):
             pre_set = pre_set * -1
             data = data[:pre_set] + pre_set_array
 
+        # import pdb; pdb.set_trace()
+        # r = 1
         return data
 
     # Oil prices
@@ -94,6 +98,8 @@ class FuelData(object):
             pre_set = pre_set * -1
             data = data[:pre_set] + pre_set_array
 
+        # import pdb; pdb.set_trace()
+        # r = 1
         return data
 
     # def oil_price_cycle_change(self, start_date, end_date):
@@ -124,12 +130,18 @@ class FuelData(object):
             pre_set = pre_set * -1
             data = data[:pre_set] + pre_set_array
 
+        # import pdb; pdb.set_trace()
+        # r = 1
         return data
 
     # Fuel Prices
 
     def fuel_prices(self, start_date=None, data_set='training'):
         select_set = 'fuel_price_' + data_set
+
+        # import pdb; pdb.set_trace()
+        # r = 1
+
         return self.db_con.execute("SELECT * FROM " + select_set + " ORDER BY date;").fetchall()
 
         # if start_date:
