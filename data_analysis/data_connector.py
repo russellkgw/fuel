@@ -172,7 +172,7 @@ class DataConnector(object):
         # import pdb; pdb.set_trace()
         # r = 1
         
-        data = self.get_data(data, flatten=flatten, percentage_change=percentage_change, normilize=normilize, lin=lin, seq_length=seq_length, pre_set=pre_set, pre_set_val=pre_set_val)
+        data, norm_data = self.get_data(data, flatten=flatten, percentage_change=percentage_change, normilize=normilize, lin=lin, seq_length=seq_length, pre_set=pre_set, pre_set_val=pre_set_val)
 
         x_array = []
         y_array = []
@@ -181,7 +181,7 @@ class DataConnector(object):
             x_array.append(item['x'])
             y_array.append(item['y'][0])
 
-        return x_array, y_array
+        return x_array, y_array, norm_data
 
 
     def get_data(self, data, flatten, percentage_change, normilize, lin, seq_length, pre_set, pre_set_val):
@@ -254,13 +254,17 @@ class DataConnector(object):
 
             feed_data.append({'date': d['date'], 'x': x, 'y': y})
 
-        return feed_data
+        return feed_data, {'fp_min': fp_min, 'fp_max': fp_max}
 
     def norm_array(self, input, min, max):
         res = []
         for i in input:  # range(len(input)):
             res.append((i - min) / (max - min))  # norm_data(input[i], min, max)
         return np.array(res)
+
+
+    def un_norm(self, x_p, min, max):
+        return x_p * (max - min) + min
 
 
 class DatePricePair():

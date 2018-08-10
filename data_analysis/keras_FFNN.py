@@ -1,3 +1,4 @@
+import datetime
 from keras.models import Sequential
 from keras.layers import LSTM, GRU
 from keras.layers import Dense, Dropout
@@ -13,9 +14,9 @@ PRE_SET = 0
 PRE_SET_VAL = 0.0
 
 data_conn = DataConnector()
-x_train_array, y_train_array = data_conn.fuel_prices_dates(start_date='2004-04-03', data_set='training', seq_length=SEQ_LENGTH, pre_set=PRE_SET, pre_set_val=PRE_SET_VAL)  # start_date='2004-04-03'    None is all
-x_test_array, y_test_array = data_conn.fuel_prices_dates(start_date='2004-04-03', data_set='testing', seq_length=SEQ_LENGTH, pre_set=PRE_SET, pre_set_val=PRE_SET_VAL)  # start_date='2004-04-03'    None is all
-x_validate_array, y_validate_array = data_conn.fuel_prices_dates(start_date='2004-04-03', data_set='validation', seq_length=SEQ_LENGTH, pre_set=PRE_SET, pre_set_val=PRE_SET_VAL)  # start_date='2004-04-03'    None is all
+x_train_array, y_train_array, train_norm = data_conn.fuel_prices_dates(start_date='2004-04-03', data_set='training', seq_length=SEQ_LENGTH, pre_set=PRE_SET, pre_set_val=PRE_SET_VAL)  # start_date='2004-04-03'    None is all
+x_test_array, y_test_array, test_norm = data_conn.fuel_prices_dates(start_date='2004-04-03', data_set='testing', seq_length=SEQ_LENGTH, pre_set=PRE_SET, pre_set_val=PRE_SET_VAL)  # start_date='2004-04-03'    None is all
+x_validate_array, y_validate_array, vali_norm = data_conn.fuel_prices_dates(start_date='2004-04-03', data_set='validation', seq_length=SEQ_LENGTH, pre_set=PRE_SET, pre_set_val=PRE_SET_VAL)  # start_date='2004-04-03'    None is all
 
 # import pdb; pdb.set_trace()
 
@@ -45,6 +46,8 @@ model.compile(loss='mse', optimizer='sgd')  # adagrad adam sgd rmsprop     , met
 PRECISION = 6
 # SPLIT = 140  # 240
 
+s = datetime.datetime.now()
+
 ### FIT ###
 print(' ### Fit the model ### ')
 x_fit = x_train_array # x_array #[:SPLIT]
@@ -69,8 +72,14 @@ print('AVERAGE TRAIN LOSS: ' + str(round(epoch_train_loss_avg, PRECISION)))
 # for e in range(len(epoch_loss_list)):
 #     print('EPOCH: ' + str(e + 1) + ' AVG LOSS: ' + str(round(epoch_loss_list[e], PRECISION)))
 
+e = datetime.datetime.now()
+print('-------------------   TIME TO TRAIN IN SECONDS: ' + str((e - s).seconds))
 
 ### EVALUATE ###
+
+def un_norm(x_p, min, max):
+    return x_p * (max - min) + min
+
 
 print(' ### Evaluate the model ### ')
 x_test = x_test_array
@@ -80,6 +89,11 @@ for i in range(len(x_test)):
     temp_x = x_test[i].reshape(1, INPUT_DIM)
     temp_y = y_test[i].reshape(1, 1)
     res = model.evaluate(temp_x, temp_y, verbose=0)
+
+    # un norm the input y
+
+    rex_2 = un_norm(res, test_norm['fp_min'], test_norm['fp_max'])
+
     # print('EVAL: ' + str(i + 1) + ' LOSS: ' + str(res))
     epoch_fit_loss_avg += res / len(x_test)
 
