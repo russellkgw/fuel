@@ -20,6 +20,10 @@ x_validate_array, y_validate_array, vali_norm = data_conn.fuel_prices_dates(star
 
 # import pdb; pdb.set_trace()
 
+# re = data_conn.un_norm(0.4, test_norm['fp_min'], test_norm['fp_max'])
+
+# import pdb; pdb.set_trace()
+
 INPUT_DIM = len(x_train_array[0])
 DROP = 0.1
 
@@ -52,7 +56,7 @@ s = datetime.datetime.now()
 print(' ### Fit the model ### ')
 x_fit = x_train_array # x_array #[:SPLIT]
 y_fit = y_train_array # y_array #[:SPLIT]
-EPOCHS = 10
+EPOCHS = 1000
 epoch_loss_list = []
 epoch_train_loss_avg = 0.0
 for e in range(EPOCHS):
@@ -75,32 +79,48 @@ print('AVERAGE TRAIN LOSS: ' + str(round(epoch_train_loss_avg, PRECISION)))
 e = datetime.datetime.now()
 print('-------------------   TIME TO TRAIN IN SECONDS: ' + str((e - s).seconds))
 
-### EVALUATE ###
 
-def un_norm(x_p, min, max):
-    return x_p * (max - min) + min
+
+### EVALUATE ###
 
 
 print(' ### Evaluate the model ### ')
 x_test = x_test_array
 y_test = y_test_array
 epoch_fit_loss_avg = 0.0
+mape = 0.0
+
+test_eval = []
+test_act = []
+
 for i in range(len(x_test)):
     temp_x = x_test[i].reshape(1, INPUT_DIM)
     temp_y = y_test[i].reshape(1, 1)
     res = model.evaluate(temp_x, temp_y, verbose=0)
 
-    # un norm the input y
+    predicted = model.predict(temp_x, verbose=0)
 
-    rex_2 = un_norm(res, test_norm['fp_min'], test_norm['fp_max'])
+    y_unorm = data_conn.un_norm(y_test[i], test_norm['fp_min'], test_norm['fp_max'])
+    predicted_unorm = data_conn.un_norm(predicted[0], test_norm['fp_min'], test_norm['fp_max'])[0]
+
+    mape += (abs(y_unorm - predicted_unorm) / y_unorm) / len(x_test)
+
+    test_act.append(y_unorm)
+    test_eval.append(predicted_unorm)
+
+    # un norm the input y
+    # rex_2 = data_conn.un_norm(res, test_norm['fp_min'], test_norm['fp_max'])
+
+    # import pdb; pdb.set_trace()
 
     # print('EVAL: ' + str(i + 1) + ' LOSS: ' + str(res))
     epoch_fit_loss_avg += res / len(x_test)
+    # mape += res / len(x_test)
 
 print('AVERAGE FIT LOSS: ' + str(round(epoch_fit_loss_avg, PRECISION)))
+print('AVERAGE MAPE: ' + str(round(mape * 100.0, PRECISION)))
 
-
-
+# import pdb; pdb.set_trace()
 
 ###  Plot  ### 
 
@@ -109,10 +129,11 @@ t = [1,2,3,4,5]
 s = [0.1,0.2,0.3,0.4,0.5]
 
 fig, ax = plt.subplots()
-ax.plot(t, s)
+# ax.plot(t, s)
+ax.plot([i + 1 for i in range(EPOCHS)], epoch_loss_list)
 
-ax.set(xlabel='time (s)', ylabel='voltage (mV)',
-       title='About as simple as it gets, folks')
+ax.set(xlabel='epochs', ylabel='loss',
+       title='loss vs epoch')
 ax.grid()
 
 plt.show()
