@@ -34,7 +34,7 @@ class FuelData(object):
 
     def exchange_rates(self, start_date, end_date, offset=60, percentage=False, pre_set=0, pre_set_val=0.0):
         offset = offset * -1
-        data = self.db_con.execute("SELECT * FROM exchange_rates WHERE CAST(STRFTIME('%w', date) AS INTEGER) IN (1, 2, 3, 4, 5) AND date >= '{0}' AND date < '{1}' ORDER BY date;".format(start_date, end_date)).fetchall()
+        data = self.db_con.execute("SELECT * FROM exchange_rates WHERE CAST(STRFTIME('%w', date) AS INTEGER) IN (1, 2, 3, 4, 5) AND date >= '{0}' AND date <= '{1}' ORDER BY date;".format(start_date, end_date)).fetchall()
         data = [e[3] for e in data]
         if percentage:
             data = self.percent_change_daily(data)
@@ -63,7 +63,7 @@ class FuelData(object):
 
     def exchange_future(self, start_date, end_date, offset=60, percentage=False, pre_set=0, pre_set_val=0.0):
         offset = offset * -1
-        data = self.db_con.execute("SELECT date, IFNULL(settle, 0.0) AS settle FROM exchange_futures WHERE CAST(STRFTIME('%w', date) AS INTEGER) IN (1, 2, 3, 4, 5) AND date >= '" + str(start_date) + "' AND date < '" + str(end_date) + "' ORDER BY date;").fetchall()
+        data = self.db_con.execute("SELECT date, IFNULL(settle, 0.0) AS settle FROM exchange_futures WHERE CAST(STRFTIME('%w', date) AS INTEGER) IN (1, 2, 3, 4, 5) AND date >= '" + str(start_date) + "' AND date <= '" + str(end_date) + "' ORDER BY date;").fetchall()
 
         data = [e[1] for e in data]
         # if percentage:
@@ -84,7 +84,7 @@ class FuelData(object):
 
     def oil_prices(self, start_date, end_date, offset=60, percentage=False, pre_set=0, pre_set_val=0.0):
         offset = offset * -1
-        data = self.db_con.execute("SELECT * FROM oil_prices WHERE CAST(STRFTIME('%w', date) AS INTEGER) IN (1, 2, 3, 4, 5) AND date >= '{0}' AND date < '{1}' ORDER BY date;".format(start_date, end_date)).fetchall()
+        data = self.db_con.execute("SELECT * FROM oil_prices WHERE CAST(STRFTIME('%w', date) AS INTEGER) IN (1, 2, 3, 4, 5) AND date >= '{0}' AND date <= '{1}' ORDER BY date;".format(start_date, end_date)).fetchall()
         data = [o[2] for o in data]
 
         # import pdb; pdb.set_trace()
@@ -117,7 +117,7 @@ class FuelData(object):
 
     def oil_future(self, start_date, end_date, offset=60, percentage=False, pre_set=0, pre_set_val=0.0):
         offset = offset * -1
-        data = self.db_con.execute("SELECT date, IFNULL(settle, 0.0) AS settle FROM oil_futures WHERE CAST(STRFTIME('%w', date) AS INTEGER) IN (1, 2, 3, 4, 5) AND date >= '" + str(start_date) + "' AND date < '" + str(end_date) + "' ORDER BY date;").fetchall()
+        data = self.db_con.execute("SELECT date, IFNULL(settle, 0.0) AS settle FROM oil_futures WHERE CAST(STRFTIME('%w', date) AS INTEGER) IN (1, 2, 3, 4, 5) AND date >= '" + str(start_date) + "' AND date <= '" + str(end_date) + "' ORDER BY date;").fetchall()
 
         data = [e[1] for e in data]
         # if percentage:

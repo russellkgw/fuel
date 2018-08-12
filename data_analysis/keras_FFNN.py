@@ -19,26 +19,24 @@ x_test_array, y_test_array, test_norm = data_conn.fuel_prices_dates(start_date='
 x_validate_array, y_validate_array, vali_norm = data_conn.fuel_prices_dates(start_date='2004-04-03', data_set='validation', seq_length=SEQ_LENGTH, pre_set=PRE_SET, pre_set_val=PRE_SET_VAL)  # start_date='2004-04-03'    None is all
 
 # import pdb; pdb.set_trace()
-
 # re = data_conn.un_norm(0.4, test_norm['fp_min'], test_norm['fp_max'])
-
 # import pdb; pdb.set_trace()
 
 INPUT_DIM = len(x_train_array[0])
-DROP = 0.1
+DROP = 0.2  # 0.2
 
 # import pdb; pdb.set_trace()
 model = Sequential()  # dropout=0.1, recurrent_dropout=0.1
 model.add(Dense(124, activation='relu', input_dim=INPUT_DIM))
-# model.add(Dropout(DROP))
+model.add(Dropout(DROP))
 model.add(Dense(248, activation='relu'))
-# model.add(Dropout(DROP))
+model.add(Dropout(DROP))
 model.add(Dense(124, activation='relu'))
-# model.add(Dropout(DROP))
+model.add(Dropout(DROP))
 model.add(Dense(62, activation='relu'))
-# model.add(Dropout(DROP))
+model.add(Dropout(DROP))
 model.add(Dense(31, activation='relu'))
-# model.add(Dropout(DROP))
+model.add(Dropout(DROP))
 model.add(Dense(1, activation='linear'))
 # sgd = optimizers.SGD(lr=0.1)  # , decay=1e-6, momentum=0.9, nesterov=True
 model.compile(loss='mse', optimizer='sgd')  # adagrad adam sgd rmsprop     , metrics=['acc']
@@ -56,29 +54,46 @@ s = datetime.datetime.now()
 print(' ### Fit the model ### ')
 x_fit = x_train_array # x_array #[:SPLIT]
 y_fit = y_train_array # y_array #[:SPLIT]
-EPOCHS = 1000
+
+EPOCHS = 50
+
 epoch_loss_list = []
 epoch_train_loss_avg = 0.0
+mape_train_list = []
+mape_train_avg = 0.0
+
 for e in range(EPOCHS):
     epoch_loss = 0.0
+    mape_train_avg_per_e = 0.0
     for i in range(len(x_fit)):
         temp_x = x_fit[i].reshape(1, INPUT_DIM)
         temp_y = y_fit[i].reshape(1, 1)
         res = model.fit(temp_x, temp_y, verbose=0, epochs=1)
-        epoch_loss += res.history['loss'][0]
+        epoch_loss += res.history['loss'][0]/len(x_fit)
 
-    print('Training EPOCH: ' + str(e))
-    epoch_loss_list.append(epoch_loss/len(x_fit))
-    epoch_train_loss_avg += (epoch_loss/len(x_fit)) / EPOCHS
+        predicted = model.predict(temp_x, verbose=0)
+        y_unorm = data_conn.un_norm(y_fit[i], train_norm['fp_min'], train_norm['fp_max'])
+        predicted_unorm = data_conn.un_norm(predicted[0], train_norm['fp_min'], train_norm['fp_max'])[0]
+        mape_train_avg_per_e += (abs(y_unorm - predicted_unorm) / y_unorm) / len(x_fit)
 
-print('AVERAGE TRAIN LOSS: ' + str(round(epoch_train_loss_avg, PRECISION)))
-# print('Epoch Losses:')
-# for e in range(len(epoch_loss_list)):
-#     print('EPOCH: ' + str(e + 1) + ' AVG LOSS: ' + str(round(epoch_loss_list[e], PRECISION)))
+        # import pdb; pdb.set_trace()
+
+
+    print('Training EPOCH: ' + str(e + 1) + ' LOSS: ' + str(epoch_loss) + ' MAPE: ' + str(mape_train_avg_per_e * 100.0))
+    epoch_loss_list.append(epoch_loss)
+    epoch_train_loss_avg += epoch_loss / EPOCHS
+
+    mape_train_list.append(mape_train_avg_per_e  * 100.0)
+    mape_train_avg += mape_train_avg_per_e / EPOCHS
 
 e = datetime.datetime.now()
 print('-------------------   TIME TO TRAIN IN SECONDS: ' + str((e - s).seconds))
 
+print('AVERAGE TRAIN LOSS: ' + str(round(epoch_train_loss_avg, PRECISION)))
+print('AVERAGE TRAIN MAPE: ' + str(round(mape_train_avg * 100.0, PRECISION)))
+# print('Epoch Losses:')
+# for e in range(len(epoch_loss_list)):
+#     print('EPOCH: ' + str(e + 1) + ' AVG LOSS: ' + str(round(epoch_loss_list[e], PRECISION)))
 
 
 ### EVALUATE ###
@@ -92,6 +107,7 @@ mape = 0.0
 
 test_eval = []
 test_act = []
+mape_test_list = []
 
 for i in range(len(x_test)):
     temp_x = x_test[i].reshape(1, INPUT_DIM)
@@ -103,7 +119,10 @@ for i in range(len(x_test)):
     y_unorm = data_conn.un_norm(y_test[i], test_norm['fp_min'], test_norm['fp_max'])
     predicted_unorm = data_conn.un_norm(predicted[0], test_norm['fp_min'], test_norm['fp_max'])[0]
 
-    mape += (abs(y_unorm - predicted_unorm) / y_unorm) / len(x_test)
+    mape_i = (abs(y_unorm - predicted_unorm) / y_unorm)
+    mape += mape_i / len(y_test)
+
+    mape_test_list.append(mape_i * 100.0)
 
     test_act.append(y_unorm)
     test_eval.append(predicted_unorm)
@@ -114,13 +133,16 @@ for i in range(len(x_test)):
     # import pdb; pdb.set_trace()
 
     # print('EVAL: ' + str(i + 1) + ' LOSS: ' + str(res))
-    epoch_fit_loss_avg += res / len(x_test)
+    epoch_fit_loss_avg += res / len(y_test)
     # mape += res / len(x_test)
 
 print('AVERAGE FIT LOSS: ' + str(round(epoch_fit_loss_avg, PRECISION)))
 print('AVERAGE MAPE: ' + str(round(mape * 100.0, PRECISION)))
 
-# import pdb; pdb.set_trace()
+
+
+# Validation
+
 
 ###  Plot  ### 
 
@@ -130,10 +152,30 @@ s = [0.1,0.2,0.3,0.4,0.5]
 
 fig, ax = plt.subplots()
 # ax.plot(t, s)
-ax.plot([i + 1 for i in range(EPOCHS)], epoch_loss_list)
+# ax.plot([i + 1 for i in range(EPOCHS)], mape_train_list)  # epoch_loss_list  mape_train_list
 
-ax.set(xlabel='epochs', ylabel='loss',
-       title='loss vs epoch')
-ax.grid()
+# ax.set(xlabel='epochs', ylabel='loss',
+#        title='loss vs epoch')
+# ax.grid()
+
+# plt.show()
+
+e_plot = [i + 1 for i in range(EPOCHS)]
+
+x1 = e_plot
+x2 = e_plot
+
+y1 = epoch_loss_list
+y2 = mape_train_list
+
+plt.subplot(1, 2, 1)  # 2, 1, 1
+plt.plot(x1, y1, 'o-')
+plt.title('LOSS MAPE')
+plt.ylabel('Loss')
+
+plt.subplot(1, 2, 2)  # 2, 1, 2
+plt.plot(x2, y2, '.-')
+plt.xlabel('Epochs')
+plt.ylabel('MAPE')
 
 plt.show()

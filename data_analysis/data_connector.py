@@ -12,12 +12,13 @@ class DataConnector(object):
         self.current_date = date.today()
 
     def fuel_date_range(self, fuel_date, num_months=3):
-        # fuel_date = str(fuel_date)
-        # split_date = fuel_date.split('-')
+        fuel_date = str(fuel_date)
+        split_date = fuel_date.split('-')
 
         # import pdb; pdb.set_trace()
 
-        end_date = parse(fuel_date)  # date(int(split_date[0]), int(split_date[1]), 27) - relativedelta(months=1)
+        # parse(fuel_date)
+        end_date = date(int(split_date[0]), int(split_date[1]), 28) - relativedelta(months=1)
         start_date = end_date - relativedelta(months=num_months)
 
         # import pdb; pdb.set_trace()
