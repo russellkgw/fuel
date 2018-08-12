@@ -91,15 +91,12 @@ print('-------------------   TIME TO TRAIN IN SECONDS: ' + str((e - s).seconds))
 
 print('AVERAGE TRAIN LOSS: ' + str(round(epoch_train_loss_avg, PRECISION)))
 print('AVERAGE TRAIN MAPE: ' + str(round(mape_train_avg * 100.0, PRECISION)))
-# print('Epoch Losses:')
-# for e in range(len(epoch_loss_list)):
-#     print('EPOCH: ' + str(e + 1) + ' AVG LOSS: ' + str(round(epoch_loss_list[e], PRECISION)))
 
 
-### EVALUATE ###
+### TESTING ###
 
 
-print(' ### Evaluate the model ### ')
+print(' ### Testing of the model ### ')
 x_test = x_test_array
 y_test = y_test_array
 epoch_fit_loss_avg = 0.0
@@ -136,12 +133,47 @@ for i in range(len(x_test)):
     epoch_fit_loss_avg += res / len(y_test)
     # mape += res / len(x_test)
 
-print('AVERAGE FIT LOSS: ' + str(round(epoch_fit_loss_avg, PRECISION)))
-print('AVERAGE MAPE: ' + str(round(mape * 100.0, PRECISION)))
+print('AVERAGE TEST LOSS: ' + str(round(epoch_fit_loss_avg, PRECISION)))
+print('AVERAGE TEST MAPE: ' + str(round(mape * 100.0, PRECISION)))
 
 
 
 # Validation
+
+# x_validate_array, y_validate_array, vali_norm
+
+print(' ### Validation of the model ### ')
+epoch_fit_loss_avg_valid = 0.0
+mape_valid = 0.0
+
+validation_eval = []
+validation_act = []
+mape_valid_list = []
+
+for i in range(len(x_validate_array)):
+    temp_x = x_validate_array[i].reshape(1, INPUT_DIM)
+    temp_y = y_validate_array[i].reshape(1, 1)
+    res = model.evaluate(temp_x, temp_y, verbose=0)
+
+    predicted = model.predict(temp_x, verbose=0)
+
+    y_unorm = data_conn.un_norm(y_validate_array[i], vali_norm['fp_min'], vali_norm['fp_max'])
+    predicted_unorm = data_conn.un_norm(predicted[0], vali_norm['fp_min'], vali_norm['fp_max'])[0]
+
+    mape_i = (abs(y_unorm - predicted_unorm) / y_unorm)
+    mape_valid += mape_i / len(y_validate_array)
+
+    mape_valid_list.append(mape_i * 100.0)
+
+    validation_act.append(y_unorm)
+    validation_eval.append(predicted_unorm)
+
+    epoch_fit_loss_avg_valid += res / len(y_validate_array)
+
+print('AVERAGE VALIDATION LOSS: ' + str(round(epoch_fit_loss_avg_valid, PRECISION)))
+print('AVERAGE VALIDATION MAPE: ' + str(round(mape_valid * 100.0, PRECISION)))
+
+
 
 
 ###  Plot  ### 
