@@ -44,9 +44,13 @@ class FuelData(object):
         data = data[offset:]
 
         if pre_set > 0:
-            pre_set_array = [pre_set_val for i in range(pre_set)]
-            pre_set = pre_set * -1
-            data = data[:pre_set] + pre_set_array
+            if pre_set_val is None:
+                pre_set = pre_set * -1
+                data = data[:pre_set]
+            else:
+                pre_set_array = [pre_set_val for i in range(pre_set)]
+                pre_set = pre_set * -1
+                data = data[:pre_set] + pre_set_array
 
         # import pdb; pdb.set_trace()
         # r = 1
@@ -72,9 +76,13 @@ class FuelData(object):
         data = data[offset:]
 
         if pre_set > 0:
-            pre_set_array = [pre_set_val for i in range(pre_set)]
-            pre_set = pre_set * -1
-            data = data[:pre_set] + pre_set_array
+            if pre_set_val is None:
+                pre_set = pre_set * -1
+                data = data[:pre_set]
+            else:
+                pre_set_array = [pre_set_val for i in range(pre_set)]
+                pre_set = pre_set * -1
+                data = data[:pre_set] + pre_set_array
 
         # import pdb; pdb.set_trace()
         # r = 1
@@ -94,9 +102,13 @@ class FuelData(object):
         data = data[offset:]
 
         if pre_set > 0:
-            pre_set_array = [pre_set_val for i in range(pre_set)]
-            pre_set = pre_set * -1
-            data = data[:pre_set] + pre_set_array
+            if pre_set_val is None:
+                pre_set = pre_set * -1
+                data = data[:pre_set]
+            else:
+                pre_set_array = [pre_set_val for i in range(pre_set)]
+                pre_set = pre_set * -1
+                data = data[:pre_set] + pre_set_array
 
         # import pdb; pdb.set_trace()
         # r = 1
@@ -126,9 +138,13 @@ class FuelData(object):
         data = data[offset:]
 
         if pre_set > 0:
-            pre_set_array = [pre_set_val for i in range(pre_set)]
-            pre_set = pre_set * -1
-            data = data[:pre_set] + pre_set_array
+            if pre_set_val is None:
+                pre_set = pre_set * -1
+                data = data[:pre_set]
+            else:
+                pre_set_array = [pre_set_val for i in range(pre_set)]
+                pre_set = pre_set * -1
+                data = data[:pre_set] + pre_set_array
 
         # import pdb; pdb.set_trace()
         # r = 1
@@ -142,7 +158,7 @@ class FuelData(object):
         # import pdb; pdb.set_trace()
         # r = 1
 
-        return self.db_con.execute("SELECT * FROM " + select_set + " ORDER BY date;").fetchall()
+        return self.db_con.execute("SELECT * FROM " + select_set).fetchall()  #  + " ORDER BY date;"
 
         # if start_date:
             # return self.db_con.execute("SELECT * FROM fuel_prices WHERE date >= '{0}' ORDER BY date;".format(start_date)).fetchall()

@@ -9,21 +9,20 @@ import matplotlib.pyplot as plt
 
 from data_connector import DataConnector
 
-SEQ_LENGTH = 60  # 20 40 60
+SEQ_LENGTH = 60  # 45 50 55 60
 PRE_SET = 0
-PRE_SET_VAL = 0.0
+PRE_SET_VAL = 0.0 # None
 
 data_conn = DataConnector()
-x_train_array, y_train_array, train_norm = data_conn.fuel_prices_dates(start_date='2004-04-03', data_set='training', seq_length=SEQ_LENGTH, pre_set=PRE_SET, pre_set_val=PRE_SET_VAL)  # start_date='2004-04-03'    None is all
-x_test_array, y_test_array, test_norm = data_conn.fuel_prices_dates(start_date='2004-04-03', data_set='testing', seq_length=SEQ_LENGTH, pre_set=PRE_SET, pre_set_val=PRE_SET_VAL)  # start_date='2004-04-03'    None is all
-x_validate_array, y_validate_array, vali_norm = data_conn.fuel_prices_dates(start_date='2004-04-03', data_set='validation', seq_length=SEQ_LENGTH, pre_set=PRE_SET, pre_set_val=PRE_SET_VAL)  # start_date='2004-04-03'    None is all
+
+x_train_array, y_train_array, train_norm = data_conn.fuel_prices_dates(start_date=None, data_set='training', seq_length=SEQ_LENGTH, pre_set=PRE_SET, pre_set_val=PRE_SET_VAL)
 
 # import pdb; pdb.set_trace()
 # re = data_conn.un_norm(0.4, test_norm['fp_min'], test_norm['fp_max'])
 # import pdb; pdb.set_trace()
 
 INPUT_DIM = len(x_train_array[0])
-DROP = 0.2  # 0.2
+DROP = 0.08  # 0.2
 
 # import pdb; pdb.set_trace()
 model = Sequential()  # dropout=0.1, recurrent_dropout=0.1
@@ -89,60 +88,13 @@ for e in range(EPOCHS):
 e = datetime.datetime.now()
 print('-------------------   TIME TO TRAIN IN SECONDS: ' + str((e - s).seconds))
 
-print('AVERAGE TRAIN LOSS: ' + str(round(epoch_train_loss_avg, PRECISION)))
-print('AVERAGE TRAIN MAPE: ' + str(round(mape_train_avg * 100.0, PRECISION)))
-
-
-### TESTING ###
-
-
-print(' ### Testing of the model ### ')
-x_test = x_test_array
-y_test = y_test_array
-epoch_fit_loss_avg = 0.0
-mape = 0.0
-
-test_eval = []
-test_act = []
-mape_test_list = []
-
-for i in range(len(x_test)):
-    temp_x = x_test[i].reshape(1, INPUT_DIM)
-    temp_y = y_test[i].reshape(1, 1)
-    res = model.evaluate(temp_x, temp_y, verbose=0)
-
-    predicted = model.predict(temp_x, verbose=0)
-
-    y_unorm = data_conn.un_norm(y_test[i], test_norm['fp_min'], test_norm['fp_max'])
-    predicted_unorm = data_conn.un_norm(predicted[0], test_norm['fp_min'], test_norm['fp_max'])[0]
-
-    mape_i = (abs(y_unorm - predicted_unorm) / y_unorm)
-    mape += mape_i / len(y_test)
-
-    mape_test_list.append(mape_i * 100.0)
-
-    test_act.append(y_unorm)
-    test_eval.append(predicted_unorm)
-
-    # un norm the input y
-    # rex_2 = data_conn.un_norm(res, test_norm['fp_min'], test_norm['fp_max'])
-
-    # import pdb; pdb.set_trace()
-
-    # print('EVAL: ' + str(i + 1) + ' LOSS: ' + str(res))
-    epoch_fit_loss_avg += res / len(y_test)
-    # mape += res / len(x_test)
-
-print('AVERAGE TEST LOSS: ' + str(round(epoch_fit_loss_avg, PRECISION)))
-print('AVERAGE TEST MAPE: ' + str(round(mape * 100.0, PRECISION)))
-
+print('AVERAGE TRAIN LOSS: ' + str(round(epoch_train_loss_avg, PRECISION)) + ' AVERAGE TRAIN MAPE: ' + str(round(mape_train_avg * 100.0, PRECISION)))
 
 
 # Validation
+x_validate_array, y_validate_array, vali_norm = data_conn.fuel_prices_dates(start_date=None, data_set='validation', seq_length=SEQ_LENGTH, pre_set=PRE_SET, pre_set_val=PRE_SET_VAL)
 
-# x_validate_array, y_validate_array, vali_norm
-
-print(' ### Validation of the model ### ')
+# print(' ### Validation of the model ### ')
 epoch_fit_loss_avg_valid = 0.0
 mape_valid = 0.0
 
@@ -170,9 +122,45 @@ for i in range(len(x_validate_array)):
 
     epoch_fit_loss_avg_valid += res / len(y_validate_array)
 
-print('AVERAGE VALIDATION LOSS: ' + str(round(epoch_fit_loss_avg_valid, PRECISION)))
-print('AVERAGE VALIDATION MAPE: ' + str(round(mape_valid * 100.0, PRECISION)))
+print('AVERAGE VALIDATION LOSS: ' + str(round(epoch_fit_loss_avg_valid, PRECISION)) + ' AVERAGE VALIDATION MAPE: ' + str(round(mape_valid * 100.0, PRECISION)))
 
+
+
+### TESTING ###
+# print(' ### Testing of the model ### ')
+
+for offset in [PRE_SET]:  # 0, 5, 10, 15
+    # trained on lenght 60 seq so test seq needs to be 60 in total.
+    x_test_array, y_test_array, test_norm = data_conn.fuel_prices_dates(start_date=None, data_set='testing', seq_length=SEQ_LENGTH, pre_set=offset, pre_set_val=PRE_SET_VAL)
+    x_test = x_test_array
+    y_test = y_test_array
+    epoch_fit_loss_avg = 0.0
+    mape = 0.0
+
+    test_eval = []
+    test_act = []
+    mape_test_list = []
+
+    for i in range(len(x_test)):
+        temp_x = x_test[i].reshape(1, INPUT_DIM)
+        temp_y = y_test[i].reshape(1, 1)
+        res = model.evaluate(temp_x, temp_y, verbose=0)
+
+        predicted = model.predict(temp_x, verbose=0)
+
+        y_unorm = data_conn.un_norm(y_test[i], test_norm['fp_min'], test_norm['fp_max'])
+        predicted_unorm = data_conn.un_norm(predicted[0], test_norm['fp_min'], test_norm['fp_max'])[0]
+
+        mape_i = (abs(y_unorm - predicted_unorm) / y_unorm)
+        mape += mape_i / len(y_test)
+
+        mape_test_list.append(mape_i * 100.0)
+
+        test_act.append(y_unorm)
+        test_eval.append(predicted_unorm)
+        epoch_fit_loss_avg += res / len(y_test)
+
+    print('TEST OFFSET: ' + str(offset) + ' AVERAGE TEST LOSS: ' + str(round(epoch_fit_loss_avg, PRECISION)) + ' AVERAGE TEST MAPE: ' + str(round(mape * 100.0, PRECISION)))
 
 
 
@@ -183,14 +171,6 @@ t = [1,2,3,4,5]
 s = [0.1,0.2,0.3,0.4,0.5]
 
 fig, ax = plt.subplots()
-# ax.plot(t, s)
-# ax.plot([i + 1 for i in range(EPOCHS)], mape_train_list)  # epoch_loss_list  mape_train_list
-
-# ax.set(xlabel='epochs', ylabel='loss',
-#        title='loss vs epoch')
-# ax.grid()
-
-# plt.show()
 
 e_plot = [i + 1 for i in range(EPOCHS)]
 
@@ -200,14 +180,14 @@ x2 = e_plot
 y1 = epoch_loss_list
 y2 = mape_train_list
 
-plt.subplot(1, 2, 1)  # 2, 1, 1
-plt.plot(x1, y1, 'o-')
-plt.title('LOSS MAPE')
-plt.ylabel('Loss')
+# plt.subplot(1, 2, 1)  # 2, 1, 1
+# plt.plot(x1, y1, 'o-')
+# plt.title('LOSS MAPE')
+# plt.ylabel('Loss')
 
-plt.subplot(1, 2, 2)  # 2, 1, 2
-plt.plot(x2, y2, '.-')
-plt.xlabel('Epochs')
-plt.ylabel('MAPE')
+# plt.subplot(1, 2, 2)  # 2, 1, 2
+# plt.plot(x2, y2, '.-')
+# plt.xlabel('Epochs')
+# plt.ylabel('MAPE')
 
-plt.show()
+# plt.show()
