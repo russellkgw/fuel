@@ -6,9 +6,9 @@ from keras import optimizers
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
-
 from data_connector import DataConnector
 
+# Data Params
 SEQ_LENGTH = 60  # 45 50 55 60
 PRE_SET = 0
 PRE_SET_VAL = 0.0 # None
@@ -18,11 +18,10 @@ data_conn = DataConnector()
 x_train_array, y_train_array, train_norm = data_conn.fuel_prices_dates(start_date=None, data_set='training', seq_length=SEQ_LENGTH, pre_set=PRE_SET, pre_set_val=PRE_SET_VAL)
 
 # import pdb; pdb.set_trace()
-# re = data_conn.un_norm(0.4, test_norm['fp_min'], test_norm['fp_max'])
-# import pdb; pdb.set_trace()
 
 INPUT_DIM = len(x_train_array[0])
 DROP = 0.08  # 0.2
+EPOCHS = 50
 
 # import pdb; pdb.set_trace()
 model = Sequential()  # dropout=0.1, recurrent_dropout=0.1
@@ -39,22 +38,14 @@ model.add(Dropout(DROP))
 model.add(Dense(1, activation='linear'))
 # sgd = optimizers.SGD(lr=0.1)  # , decay=1e-6, momentum=0.9, nesterov=True
 model.compile(loss='mse', optimizer='sgd')  # adagrad adam sgd rmsprop     , metrics=['acc']
-# print(model.summary())
 
-# print('size of x: ' + str(len(x_array)))
-
-# import pdb; pdb.set_trace()
 PRECISION = 6
-# SPLIT = 140  # 240
 
 s = datetime.datetime.now()
 
 ### FIT ###
-print(' ### Fit the model ### ')
-x_fit = x_train_array # x_array #[:SPLIT]
-y_fit = y_train_array # y_array #[:SPLIT]
-
-EPOCHS = 50
+x_fit = x_train_array
+y_fit = y_train_array
 
 epoch_loss_list = []
 epoch_train_loss_avg = 0.0
@@ -87,11 +78,10 @@ for e in range(EPOCHS):
 
 e = datetime.datetime.now()
 print('-------------------   TIME TO TRAIN IN SECONDS: ' + str((e - s).seconds))
-
 print('AVERAGE TRAIN LOSS: ' + str(round(epoch_train_loss_avg, PRECISION)) + ' AVERAGE TRAIN MAPE: ' + str(round(mape_train_avg * 100.0, PRECISION)))
 
 
-# Validation
+### Validation ###
 x_validate_array, y_validate_array, vali_norm = data_conn.fuel_prices_dates(start_date=None, data_set='validation', seq_length=SEQ_LENGTH, pre_set=PRE_SET, pre_set_val=PRE_SET_VAL)
 
 # print(' ### Validation of the model ### ')

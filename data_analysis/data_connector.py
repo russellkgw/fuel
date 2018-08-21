@@ -237,6 +237,7 @@ class DataConnector(object):
         # print('o min: ' + str(oil_min)), print('o max: ' + str(oil_max))
         # print('ef min: ' + str(exr_f_min)), print('ef max: ' + str(exr_f_max))
         # print('of min: ' + str(oil_f_min)), print('of max: ' + str(oil_f_max))
+        # import pdb; pdb.set_trace()
         
         feed_data = []
         for d in data_map:
