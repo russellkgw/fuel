@@ -20,7 +20,7 @@ x_train_array, y_train_array, train_norm = data_conn.fuel_prices_dates(start_dat
 # import pdb; pdb.set_trace()
 
 INPUT_DIM = len(x_train_array[0])
-DROP = 0.08  # 0.2
+DROP = 0.06 # 0.08  # 0.2
 EPOCHS = 50
 
 # import pdb; pdb.set_trace()
