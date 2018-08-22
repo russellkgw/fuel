@@ -9,22 +9,23 @@ import matplotlib.pyplot as plt
 from data_connector import DataConnector
 
 # Data Params
-SEQ_LENGTH = 60  # 45 50 55 60
-PRE_SET = 0
-PRE_SET_VAL = 0.0 # None
+SEQ_LENGTH = 50  # 45 50 55 60
+PRE_SET = 10
+PRE_SET_VAL = None # None
 
 data_conn = DataConnector()
 
 x_train_array, y_train_array, train_norm = data_conn.fuel_prices_dates(start_date=None, data_set='training', seq_length=SEQ_LENGTH, pre_set=PRE_SET, pre_set_val=PRE_SET_VAL)
 
-# import pdb; pdb.set_trace()
-
 INPUT_DIM = len(x_train_array[0])
-DROP = 0.06 # 0.08  # 0.2
+DROP = 0.04 # 0.08  # 0.2
 EPOCHS = 50
+LR = 0.01
+DECAY = 1e-6
+MOMENTUM = 0.5
+PRECISION = 6
 
-# import pdb; pdb.set_trace()
-model = Sequential()  # dropout=0.1, recurrent_dropout=0.1
+model = Sequential()
 model.add(Dense(124, activation='relu', input_dim=INPUT_DIM))
 model.add(Dropout(DROP))
 model.add(Dense(248, activation='relu'))
@@ -36,10 +37,10 @@ model.add(Dropout(DROP))
 model.add(Dense(31, activation='relu'))
 model.add(Dropout(DROP))
 model.add(Dense(1, activation='linear'))
-# sgd = optimizers.SGD(lr=0.1)  # , decay=1e-6, momentum=0.9, nesterov=True
-model.compile(loss='mse', optimizer='sgd')  # adagrad adam sgd rmsprop     , metrics=['acc']
+sgd = optimizers.SGD(lr=LR, decay=DECAY, momentum=MOMENTUM)
+model.compile(loss='mse', optimizer=sgd)
 
-PRECISION = 6
+# print(model.summary())
 
 s = datetime.datetime.now()
 
@@ -151,24 +152,26 @@ for offset in [PRE_SET]:  # 0, 5, 10, 15
         epoch_fit_loss_avg += res / len(y_test)
 
     print('TEST OFFSET: ' + str(offset) + ' AVERAGE TEST LOSS: ' + str(round(epoch_fit_loss_avg, PRECISION)) + ' AVERAGE TEST MAPE: ' + str(round(mape * 100.0, PRECISION)))
+    print('')
+    print('TestExpected: ' + str(test_act) + ' TestPredicted: ' + str(test_eval))
 
 
 
 ###  Plot  ### 
 
 # Data for plotting
-t = [1,2,3,4,5]
-s = [0.1,0.2,0.3,0.4,0.5]
+# t = [1,2,3,4,5]
+# s = [0.1,0.2,0.3,0.4,0.5]
 
-fig, ax = plt.subplots()
+# fig, ax = plt.subplots()
 
-e_plot = [i + 1 for i in range(EPOCHS)]
+# e_plot = [i + 1 for i in range(EPOCHS)]
 
-x1 = e_plot
-x2 = e_plot
+# x1 = e_plot
+# x2 = e_plot
 
-y1 = epoch_loss_list
-y2 = mape_train_list
+# y1 = epoch_loss_list
+# y2 = mape_train_list
 
 # plt.subplot(1, 2, 1)  # 2, 1, 1
 # plt.plot(x1, y1, 'o-')

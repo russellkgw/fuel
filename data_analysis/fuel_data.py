@@ -154,11 +154,17 @@ class FuelData(object):
 
     def fuel_prices(self, start_date=None, data_set='training'):
         select_set = 'fuel_price_' + data_set
+        query = "SELECT * FROM " + select_set
+
+        # if data_set == 'training':
+        #     query += ' limit 60'
+        # else:
+        #     query += ' limit 15'
 
         # import pdb; pdb.set_trace()
-        # r = 1
-
-        return self.db_con.execute("SELECT * FROM " + select_set).fetchall()  #  + " ORDER BY date;"
+        # rrr = 1
+            
+        return self.db_con.execute(query).fetchall()  #  + " ORDER BY date;"
 
         # if start_date:
             # return self.db_con.execute("SELECT * FROM fuel_prices WHERE date >= '{0}' ORDER BY date;".format(start_date)).fetchall()

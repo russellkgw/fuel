@@ -7,9 +7,9 @@ import numpy as np
 from data_connector import DataConnector
 
 # Data Params
-SEQ_LENGTH = 60  # 45 50 55 60
-PRE_SET = 0
-PRE_SET_VAL = 0.0 # None
+SEQ_LENGTH = 50  # 45 50 55 60
+PRE_SET = 10
+PRE_SET_VAL = None # None
 
 data_conn = DataConnector()
 x_train_array, y_train_array, train_norm = data_conn.fuel_prices_dates(start_date=None, flatten=False, percentage_change=False, data_set='training', seq_length=SEQ_LENGTH, pre_set=PRE_SET, pre_set_val=PRE_SET_VAL)
@@ -17,9 +17,13 @@ x_train_array, y_train_array, train_norm = data_conn.fuel_prices_dates(start_dat
 # Hyper Params
 SEQ_LEN = len(x_train_array[0])
 INPUT_DIM = len(x_train_array[0][0])
-DROP = 0.06  # 0.2
+
+DROP = 0.04 # 0.08  # 0.2
 EPOCHS = 20
 PRECISION = 6
+LR = 0.01
+DECAY = 1e-6
+MOMENTUM = 0.5
 
 # NB!!!
 # Keras provides exibility to decouple the resetting of internal state from updates to network
@@ -42,8 +46,8 @@ model.add(Dropout(DROP))
 model.add(Dense(60, activation='relu'))
 model.add(Dropout(DROP))
 model.add(Dense(1, activation='linear'))
-# sgd = optimizers.SGD(lr=0.1)  # , decay=1e-6, momentum=0.9, nesterov=True
-model.compile(loss='mse', optimizer='sgd', metrics=['acc'])  # adagrad adam sgd rmsprop
+sgd = optimizers.SGD(lr=LR, decay=DECAY, momentum=MOMENTUM)
+model.compile(loss='mse', optimizer=sgd, metrics=['acc'])
 
 
 ### FIT ###
