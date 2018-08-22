@@ -39,9 +39,9 @@ MOMENTUM = 0.5
 
 # import pdb; pdb.set_trace()
 model = Sequential()  # dropout=0.1, recurrent_dropout=0.1
-model.add(LSTM(240, activation='relu', return_sequences=True, input_shape=(SEQ_LEN, INPUT_DIM)))  # LSTM GRU  return_state=True
-model.add(LSTM(120, activation='relu', return_sequences=True))  # activation='tanh', recurrent_activation='hard_sigmoid'
-model.add(LSTM(60, activation='relu'))
+model.add(GRU(240, activation='relu', return_sequences=True, input_shape=(SEQ_LEN, INPUT_DIM)))  # LSTM GRU  return_state=True
+model.add(GRU(120, activation='relu', return_sequences=True))  # activation='tanh', recurrent_activation='hard_sigmoid'
+model.add(GRU(60, activation='relu'))
 model.add(Dropout(DROP))
 model.add(Dense(60, activation='relu'))
 model.add(Dropout(DROP))

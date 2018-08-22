@@ -9,18 +9,22 @@ import matplotlib.pyplot as plt
 
 from data_connector import DataConnector
 
-SEQ_LENGTH = 60  # 45 50 55 60
-PRE_SET = 0
-PRE_SET_VAL = 0.0 # None
+SEQ_LENGTH = 50  # 45 50 55 60
+PRE_SET = 10
+PRE_SET_VAL = None # None
 
 data_conn = DataConnector()
 x_array, y_array, train_norm = data_conn.fuel_prices_dates(start_date=None, flatten=False, percentage_change=False, data_set='training', seq_length=SEQ_LENGTH, pre_set=PRE_SET, pre_set_val=PRE_SET_VAL)
 
 SEQ_LEN = len(x_array[0])
 INPUT_DIM = len(x_array[0][0])
-DROP = 0.08  # 0.2
 
-# import pdb; pdb.set_trace()
+DROP = 0.04 # 0.08  # 0.2
+EPOCHS = 50
+PRECISION = 6
+LR = 0.01
+DECAY = 1e-6
+MOMENTUM = 0.5
 
 
 model = Sequential()
@@ -32,13 +36,13 @@ model.add(MaxPooling2D(pool_size=(2, 2)))
 # model.add(Dropout(DROP))
 model.add(Flatten())
 model.add(Dense(30, activation='relu'))
-# model.add(Dropout(DROP))
+model.add(Dropout(DROP))
 model.add(Dense(10, activation='relu'))
-# model.add(Dropout(DROP))
+model.add(Dropout(DROP))
 model.add(Dense(1))
 
-model.compile(loss='mse', optimizer='sgd', metrics=['acc'])
-# print(model.summary())
+sgd = optimizers.SGD(lr=LR, decay=DECAY, momentum=MOMENTUM)
+model.compile(loss='mse', optimizer=sgd, metrics=['acc'])
 
 # import pdb; pdb.set_trace()
 PRECISION = 6
@@ -48,7 +52,6 @@ s = datetime.datetime.now()
 print(' ### Fit the model ### ')
 x_fit = x_array
 y_fit = y_array
-EPOCHS = 50
 
 epoch_loss_list = []
 epoch_train_loss_avg = 0.0

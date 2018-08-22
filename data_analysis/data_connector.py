@@ -253,7 +253,6 @@ class DataConnector(object):
                 x = np.append(x, x4)
             else:
                 x = np.column_stack((x1, x2, x3, x4))
-                x = np.column_stack((x1, x2))
 
             feed_data.append({'date': d['date'], 'x': x, 'y': y})
 
