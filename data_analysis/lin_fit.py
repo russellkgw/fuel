@@ -1,6 +1,7 @@
 import numpy as np
 import statsmodels.api as sm
 import statsmodels.formula.api as smf
+import datetime
 
 from data_connector import DataConnector
 data_conn = DataConnector()
@@ -17,8 +18,12 @@ for i in [60, 55, 50, 45, 40, 35, 30, 25, 20, 15, 10, 5]:
     x_array = [np.column_stack((np.average(x[:,0]), np.average(x[:,1])))[0] for x in x_train_array]  # rand value of oil price
     x_array = sm.add_constant(x_array)
 
+    s = datetime.datetime.now()
+
     results = sm.OLS(y_train_array, x_array).fit()
     # print(results.summary())
+    e = datetime.datetime.now()
+    print('-------------------   TIME TO TRAIN IN SECONDS: ' + str((e - s)))
 
     # Test
     x_test_array, y_test_array, test_norm = data_conn.fuel_prices_dates(start_date=None, flatten=False, percentage_change=False, normilize=False, data_set='testing', seq_length=SEQ_LENGTH, pre_set=PRE_SET, pre_set_val=PRE_SET_VAL)
