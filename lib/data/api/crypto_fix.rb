@@ -1,8 +1,8 @@
 class Data::Api::CryptoFix
   def self.insert_averages
 
-    btc_fixes = compute_btc_fixes
-    ltc_fixes = compute_ltc_fixes
+    btc_fixes = compute_btc_fixes # 33
+    ltc_fixes = compute_ltc_fixes # 33
 
     # byebug
 
@@ -10,16 +10,28 @@ class Data::Api::CryptoFix
       next if BtcPrice.where(date: date).any?
 
       BtcPrice.create({ date: date,
+                        high: vals[:high],
+                        low: vals[:low],
                         mid: vals[:mid],
-                        volume: vals[:volume] })
+                        last: vals[:last],
+                        bid: vals[:bid],
+                        ask: vals[:ask],
+                        volume: vals[:volume],
+                        is_average: true })
     end
 
     ltc_fixes.each do |date, vals|
       next if LtcPrice.where(date: date).any?
 
       LtcPrice.create({ date: date,
+                        high: vals[:high],
+                        low: vals[:low],
                         mid: vals[:mid],
-                        volume: vals[:volume] })  # add high low last bid ask
+                        last: vals[:last],
+                        bid: vals[:bid],
+                        ask: vals[:ask],
+                        volume: vals[:volume],
+                        is_average: true })
     end
   end
 
@@ -38,7 +50,13 @@ class Data::Api::CryptoFix
       after = BtcPrice.where("date > ?", date).order(date: :asc).first
 
       if before.present? && after.present?
-        fixes[date.to_s] = {mid: (before.mid + after.mid) / 2.0, volume: (before.volume + after.volume) / 2.0}
+        fixes[date.to_s] = { high: (before.high + after.high) / 2.0,
+                             low: (before.low + after.low) / 2.0,
+                             mid: (before.mid + after.mid) / 2.0,
+                             last: (before.last + after.last) / 2.0,
+                             bid: (before.bid + after.bid) / 2.0,
+                             ask: (before.ask + after.ask) / 2.0,
+                             volume: (before.volume + after.volume) / 2.0 }
       end
     end
 
@@ -60,7 +78,13 @@ class Data::Api::CryptoFix
       after = LtcPrice.where("date > ?", date).order(date: :asc).first
 
       if before.present? && after.present?
-        fixes[date.to_s] = {mid: (before.mid + after.mid) / 2.0, volume: (before.volume + after.volume) / 2.0}
+        fixes[date.to_s] = { high: (before.high + after.high) / 2.0,
+                             low: (before.low + after.low) / 2.0,
+                             mid: (before.mid + after.mid) / 2.0,
+                             last: (before.last + after.last) / 2.0,
+                             bid: (before.bid + after.bid) / 2.0,
+                             ask: (before.ask + after.ask) / 2.0,
+                             volume: (before.volume + after.volume) / 2.0 }
       end
     end
 
