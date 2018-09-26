@@ -8,6 +8,13 @@ namespace :api_services do
     Data::Api::OilFutureService.call_service
   end
 
+  task make_crypto_call: :environment do
+    Data::Api::BtcPriceService.call_service
+    Data::Api::LtcPriceService.call_service
+
+    # Data::Api::CryptoFix.insert_averages
+  end
+
   desc "data exchange rate fix"
   task fix_exchange_data: :environment do
     Data::Api::ExchangeRateFix.insert_averages
