@@ -9,17 +9,17 @@ class Data::Api::CryptoFix
     btc_fixes.each do |date, vals|
       next if BtcPrice.where(date: date).any?
 
-      # BtcPrice.create({ date: date,
-      #                   mid: vals.mid,
-      #                   volume: vals.volume })
+      BtcPrice.create({ date: date,
+                        mid: vals[:mid],
+                        volume: vals[:volume] })
     end
 
     ltc_fixes.each do |date, vals|
       next if LtcPrice.where(date: date).any?
 
-      # LtcPrice.create({ date: date,
-      #                   mid: vals.mid,
-      #                   volume: vals.volume })
+      LtcPrice.create({ date: date,
+                        mid: vals[:mid],
+                        volume: vals[:volume] })  # add high low last bid ask
     end
   end
 
