@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 
 # Common
-gem 'rails', '~> 5.0.0', '>= 5.0.0.1'
+gem 'rails', '~> 7.0.3'
 gem 'puma', '~> 5.6'
 
 # JS
