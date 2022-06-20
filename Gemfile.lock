@@ -144,7 +144,7 @@ GEM
       zeitwerk (~> 2.5)
     rake (13.0.6)
     ref (2.0.0)
-    sqlite3 (1.4.2)
+    sqlite3 (1.4.4)
     strscan (3.0.3)
     therubyracer (0.12.3)
       libv8 (~> 3.16.14.15)
