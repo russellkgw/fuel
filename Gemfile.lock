@@ -137,7 +137,7 @@ GEM
       zeitwerk (~> 2.5)
     rake (13.0.6)
     ref (2.0.0)
-    sqlite3 (1.5.3)
+    sqlite3 (1.5.4)
       mini_portile2 (~> 2.8.0)
     therubyracer (0.12.3)
       libv8 (~> 3.16.14.15)
