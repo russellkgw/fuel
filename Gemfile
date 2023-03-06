@@ -2,7 +2,7 @@ source 'https://rubygems.org'
 
 # Common
 gem 'rails', '~> 7.0.4'
-gem 'puma', '~> 6.0'
+gem 'puma', '~> 6.1'
 
 # JS
 gem 'therubyracer', platforms: :ruby
